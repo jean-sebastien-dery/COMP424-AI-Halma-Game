@@ -1,0 +1,75 @@
+# Server version 0.08 running on jdery-S400CA:8123
+# Game ID: 14
+# Board class: halma.CCBoard
+# Timeout: 300000
+# Date: Fri Mar 21 21:44:22 EDT 2014
+# Player 1: Player-0, '260430688', running on localhost
+# Player 2: Player-1, 'random', running on localhost
+# Player 3: Player-2, 'random', running on localhost
+# Player 4: Player-3, 'random', running on localhost
+START Player-0 260430688
+START Player-1 random
+START Player-2 random
+START Player-3 random
+0 (2,2) (3,3)
+1 (12,0) (11,1)
+2 (3,14) (4,13)
+3 (13,13) (13,12)
+0 (3,3) (4,4)
+1 (13,2) (15,4)
+1 (15,4) (13,2)
+1 (13,2) (11,0)
+1 (11,0) (11,2)
+1 (11,2) (11,0)
+1 (11,0) (13,2)
+1 (13,2) (11,0)
+1 (11,0) (13,2)
+1 (13,2) (11,0)
+1 null null
+2 (2,13) (2,12)
+3 (12,14) (12,13)
+0 (4,4) (5,5)
+1 (15,2) (13,4)
+1 null null
+2 (4,13) (3,12)
+3 (14,12) (14,11)
+0 (5,5) (6,6)
+1 (14,3) (15,4)
+2 (3,15) (4,14)
+3 (14,13) (13,13)
+0 (6,6) (7,7)
+1 (12,1) (13,2)
+2 (2,12) (3,11)
+3 (12,13) (14,13)
+3 null null
+0 (7,7) (8,8)
+1 (15,4) (15,2)
+1 null null
+2 (3,11) (3,13)
+2 (3,13) (5,15)
+2 (5,15) (3,13)
+2 null null
+3 (13,12) (12,11)
+0 (8,8) (9,9)
+1 (15,2) (14,3)
+2 (0,12) (0,11)
+3 (12,15) (11,15)
+0 (9,9) (10,10)
+1 (11,1) (12,1)
+2 (1,14) (3,14)
+2 (3,14) (5,14)
+2 (5,14) (3,14)
+2 null null
+3 (11,15) (12,14)
+0 (10,10) (11,11)
+1 (15,3) (15,4)
+2 (3,14) (4,15)
+3 (14,15) (12,15)
+3 null null
+0 (11,11) (12,12)
+1 (12,1) (11,2)
+2 (4,15) (3,15)
+3 (13,14) (14,15)
+GAMEOVER ILLEGAL MOVE: Player 0 move from (L,12) to (M,13)
+WINNER Player-1
+# Game ended: Fri Mar 21 21:44:24 EDT 2014
