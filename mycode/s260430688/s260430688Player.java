@@ -86,6 +86,8 @@ public class s260430688Player extends Player {
 			this.currentMove = currentMove;
 		}
 	}
+	
+	private boolean isPlayerInitialized = false;
 
 	/**
 	 * Constructor.
@@ -95,7 +97,6 @@ public class s260430688Player extends Player {
 	public s260430688Player() {
 		// Instantiates my implementation with my McGill ID.
 		super("260430688");
-		this.initializePlayer();
 	}
 	
 	/**
@@ -105,7 +106,6 @@ public class s260430688Player extends Player {
 	 */
 	public s260430688Player(String s) {
 		super(s);
-		this.initializePlayer();
 	}
     
 	/**
@@ -114,31 +114,45 @@ public class s260430688Player extends Player {
     public Board createBoard() { return new CCBoard(); }
     
     private void initializePlayer() {
+    	System.out.println("The current color of my player is " + this.getColor());
+    	
+    	if (this.board == null) {
+    		// No assumptions are made, handles the initialization if the board was not set properly
+        	// before this method is called. The points for the heuristic will therefore not reflect
+        	// the current configuration of the board.
+    		System.err.println("The board was not properly set, cannot initialize the player.");
+    		this.borderCellsInGoalZone[0] = new Point(7, 7);
+    		this.borderCellsInGoalZone[1] = new Point(7, 7);
+    		this.borderCellsInGoalZone[2] = new Point(7, 7);
+    		this.borderCellsInGoalZone[3] = new Point(7, 7);
+    		return;
+    	}
+    	
     	// Sets the point that will be used for to calculate the heuristic.
-    	if (this.getColor() == 0) { // Upper left
-    		this.borderCellsInGoalZone[0] = new Point(16, 13);
-    		this.borderCellsInGoalZone[1] = new Point(15, 13);
-    		this.borderCellsInGoalZone[2] = new Point(14, 14);
-    		this.borderCellsInGoalZone[3] = new Point(13, 15);
-    		this.borderCellsInGoalZone[4] = new Point(13, 16);
-    	} else if (this.getColor() == 1) { // Lower left
-    		this.borderCellsInGoalZone[0] = new Point(13, 1);
-    		this.borderCellsInGoalZone[1] = new Point(13, 2);
-    		this.borderCellsInGoalZone[2] = new Point(3, 3);
-    		this.borderCellsInGoalZone[3] = new Point(15, 4);
-    		this.borderCellsInGoalZone[4] = new Point(16, 4);
-    	} else if (this.getColor() == 2) { // Upper right
-    		this.borderCellsInGoalZone[0] = new Point(1, 13);
-    		this.borderCellsInGoalZone[1] = new Point(2, 13);
-    		this.borderCellsInGoalZone[2] = new Point(3, 14);
-    		this.borderCellsInGoalZone[3] = new Point(4, 15);
-    		this.borderCellsInGoalZone[4] = new Point(5, 16);
-    	} else if (this.getColor() == 3) { // Lower right
-    		this.borderCellsInGoalZone[0] = new Point(4, 1);
-    		this.borderCellsInGoalZone[1] = new Point(4, 2);
-    		this.borderCellsInGoalZone[2] = new Point(3, 3);
-    		this.borderCellsInGoalZone[3] = new Point(1, 4);
-    		this.borderCellsInGoalZone[4] = new Point(2, 4);
+    	if (this.playerID == 0) { // Upper left
+    		this.borderCellsInGoalZone[0] = new Point(15, 12);
+    		this.borderCellsInGoalZone[1] = new Point(14, 12);
+    		this.borderCellsInGoalZone[2] = new Point(13, 13);
+    		this.borderCellsInGoalZone[3] = new Point(12, 14);
+    		this.borderCellsInGoalZone[4] = new Point(12, 15);
+    	} else if (this.playerID == 1) { // Lower left
+    		this.borderCellsInGoalZone[0] = new Point(12, 0);
+    		this.borderCellsInGoalZone[1] = new Point(12, 1);
+    		this.borderCellsInGoalZone[2] = new Point(2, 2);
+    		this.borderCellsInGoalZone[3] = new Point(14, 3);
+    		this.borderCellsInGoalZone[4] = new Point(15, 3);
+    	} else if (this.playerID == 2) { // Upper right
+    		this.borderCellsInGoalZone[0] = new Point(0, 12);
+    		this.borderCellsInGoalZone[1] = new Point(1, 12);
+    		this.borderCellsInGoalZone[2] = new Point(2, 13);
+    		this.borderCellsInGoalZone[3] = new Point(3, 14);
+    		this.borderCellsInGoalZone[4] = new Point(4, 15);
+    	} else if (this.playerID == 3) { // Lower right
+    		this.borderCellsInGoalZone[0] = new Point(3, 0);
+    		this.borderCellsInGoalZone[1] = new Point(3, 1);
+    		this.borderCellsInGoalZone[2] = new Point(2, 2);
+    		this.borderCellsInGoalZone[3] = new Point(0, 3);
+    		this.borderCellsInGoalZone[4] = new Point(1, 3);
     	}
     }
 
@@ -147,9 +161,12 @@ public class s260430688Player extends Player {
 		// Casts the abstract class into its implementation.
 		this.board = (CCBoard) board;
 		
-		ArrayList<CCMove> myTokenMoves = new ArrayList<CCMove>(30);
+		// Initializes the player based on the current board configuration.
+		if (!isPlayerInitialized) {
+			this.initializePlayer();
+		}
 		
-		this.priorityQueue = new PriorityQueue<WeightedMove>(board.getNumberOfPlayers()*NUMBER_OF_TOKEN_PER_PLAYER, new MoveComparator());
+		ArrayList<CCMove> allMyPossibleValidMoves = new ArrayList<CCMove>(30);
 		
 		// Gets the list of possible moves for all players given the current configuration of the board.
 		ArrayList<CCMove> moves = this.board.getLegalMoves();
@@ -177,7 +194,7 @@ public class s260430688Player extends Player {
 						System.out.println("\t This move is not valid since there is a token at the destination. Skipping it.");
 					} else {
 						// The move is for one of my piece so I add it to the array list that contains all my possible moves.
-						myTokenMoves.add(moveForCurrentPiece);
+						allMyPossibleValidMoves.add(moveForCurrentPiece);
 						
 //						int moveValue = this.giveMoveValue(moveForCurrentPiece);
 //						this.priorityQueue.add(new WeightedMove(moveForCurrentPiece, moveValue));
@@ -197,8 +214,28 @@ public class s260430688Player extends Player {
 		// At this point in the code, I have the list of all the valid moves for my tokens. I need to calculate the current heuristic of all
 		// the moves. The heuristic will be the summation of the Manhattan distance between the token and the closest cell in the goal zone.
 		
-		// Here I am going through all my possible move and computing the current heuristic 		
+		// Here I am going through all the pieces currently placed in the board to have the cumulated Manhattan distance for all the pieces.
+		int heuristicValueBeforeMove = 0;
+		ArrayList<Point> allMyPieces = this.board.getPieces(this.playerID);
+		for (Point currentToken : allMyPieces) {
+			heuristicValueBeforeMove += this.getHeuristicValue(currentToken);
+		}
 		
+		System.out.println("The current heuristic value of the board configuration before a move is " + heuristicValueBeforeMove);
+		
+		
+		
+		// Here I am going through all my possible moves and compute the current heuristic after the move has been executed.
+
+		this.priorityQueue = new PriorityQueue<WeightedMove>(board.getNumberOfPlayers()*NUMBER_OF_TOKEN_PER_PLAYER, new MoveComparator());
+		
+		for (CCMove currentMove : allMyPossibleValidMoves) {
+			int heuristicValueAfterCurrentMove = heuristicValueBeforeMove - (this.getHeuristicValue(currentMove.getFrom())) + (this.getHeuristicValue(currentMove.getTo()));
+			int valueOfMove = this.giveMoveValue(currentMove, heuristicValueAfterCurrentMove);
+			
+			WeightedMove currentWeightedMove = new WeightedMove(currentMove, valueOfMove);
+			this.priorityQueue.add(currentWeightedMove);
+		}
 		
 		// After I have built the priority queue, I need to make a decision so I take the move that has the lowest value in the queue.
 		
@@ -216,7 +253,7 @@ public class s260430688Player extends Player {
 	 * @param currentMove The move to evaluate.
 	 * @return The value of the current move.
 	 */
-	private int giveMoveValue(CCMove currentMove) {
+	private int giveMoveValue(CCMove currentMove, int heuristicValue) {
 		// Here I increment the cost of path by one because I want to encourage moves
 		// that goes over another token.
 		
@@ -224,14 +261,14 @@ public class s260430688Player extends Player {
 		
 		int costOfTravell;
 		if (travelledDistance == 1) {
-			costOfTravell = 2;
+			costOfTravell = 4;
 		} else if (travelledDistance == 2) {
-			costOfTravell = 1;
-		} else {
 			costOfTravell = 2;
+		} else {
+			costOfTravell = 4;
 		}
 		
-		int moveValue = (this.costOfPathSoFar + costOfTravell) + this.calculateHeuristic(currentMove.getTo());
+		int moveValue = (this.costOfPathSoFar + costOfTravell) + heuristicValue;
 		
 		System.out.println("\t The cost of travell is " + costOfTravell);
 		System.out.println("\t The move value is " + moveValue);
@@ -262,7 +299,7 @@ public class s260430688Player extends Player {
 	 * @param currentMove The move to evaluate.
 	 * @return The value of the heuristic for the current move.
 	 */
-	private int calculateHeuristic(Point position) {
+	private int getHeuristicValue(Point position) {
 		
 		// The heuristic that I am using is the Manhattan distance between the 
 		// current piece and the closest cell in the goal zone.
