@@ -158,9 +158,6 @@ public class s260430688Player extends Player {
 					} else {
 						// The move is for one of my piece so I add it to the array list that contains all my possible moves.
 						allMyPossibleValidMoves.add(moveForCurrentPiece);
-						
-//						int moveValue = this.giveMoveValue(moveForCurrentPiece);
-//						this.priorityQueue.add(new WeightedMove(moveForCurrentPiece, moveValue));
 					}
 					
 				} else {
@@ -185,8 +182,6 @@ public class s260430688Player extends Player {
 		}
 		
 		System.out.println("The current heuristic value of the board configuration before a move is " + heuristicValueBeforeMove);
-		
-		
 		
 		// Here I am going through all my possible moves and compute the current heuristic after the move has been executed.
 
