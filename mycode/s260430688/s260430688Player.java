@@ -123,12 +123,13 @@ public class s260430688Player extends Player {
 	public Move chooseMove(Board board) {
 		// Casts the abstract class into its implementation.
 		this.board = (CCBoard) board;
-		
+
 		// Initializes the player based on the current board configuration.
 		if (!isPlayerInitialized) {
 			this.initializePlayer();
 		}
 		
+		// Starts with an empty list of my possible moves.
 		ArrayList<CCMove> allMyPossibleValidMoves = new ArrayList<CCMove>(30);
 		
 		// Gets the list of possible moves for all players given the current configuration of the board.
@@ -185,10 +186,11 @@ public class s260430688Player extends Player {
 		
 		// Here I am going through all my possible moves and compute the current heuristic after the move has been executed.
 
+		// Creating an empty queue that will be used to determine the move to play.
 		this.priorityQueue = new PriorityQueue<WeightedMove>(board.getNumberOfPlayers()*NUMBER_OF_TOKEN_PER_PLAYER, new MoveComparator());
 		
 		for (CCMove currentMove : allMyPossibleValidMoves) {
-			double heuristicValueAfterCurrentMove = heuristicValueBeforeMove - (this.getHeuristicValue(currentMove.getFrom())) + (this.getHeuristicValue(currentMove.getTo()));
+			double heuristicValueAfterCurrentMove = heuristicValueBeforeMove - this.getHeuristicValue(currentMove.getFrom()) + this.getHeuristicValue(currentMove.getTo());
 			double valueOfMove = this.giveMoveValue(currentMove, heuristicValueAfterCurrentMove);
 			
 			WeightedMove currentWeightedMove = new WeightedMove(currentMove, valueOfMove);
