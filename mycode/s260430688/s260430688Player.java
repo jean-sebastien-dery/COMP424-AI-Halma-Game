@@ -193,8 +193,8 @@ public class s260430688Player extends Player {
 		this.priorityQueue = new PriorityQueue<WeightedMove>(board.getNumberOfPlayers()*NUMBER_OF_TOKEN_PER_PLAYER, new MoveComparator());
 		
 		for (CCMove currentMove : allMyPossibleValidMoves) {
-			int heuristicValueAfterCurrentMove = heuristicValueBeforeMove - (this.getHeuristicValue(currentMove.getFrom())) + (this.getHeuristicValue(currentMove.getTo()));
-			int valueOfMove = this.giveMoveValue(currentMove, heuristicValueAfterCurrentMove);
+			double heuristicValueAfterCurrentMove = heuristicValueBeforeMove - (this.getHeuristicValue(currentMove.getFrom())) + (this.getHeuristicValue(currentMove.getTo()));
+			double valueOfMove = this.giveMoveValue(currentMove, heuristicValueAfterCurrentMove);
 			
 			WeightedMove currentWeightedMove = new WeightedMove(currentMove, valueOfMove);
 			this.priorityQueue.add(currentWeightedMove);
@@ -216,7 +216,7 @@ public class s260430688Player extends Player {
 	 * @param currentMove The move to evaluate.
 	 * @return The value of the current move.
 	 */
-	private int giveMoveValue(CCMove currentMove, int heuristicValue) {
+	private double giveMoveValue(CCMove currentMove, double heuristicValue) {
 		// Here I increment the cost of path by one because I want to encourage moves
 		// that goes over another token.
 		
@@ -231,7 +231,7 @@ public class s260430688Player extends Player {
 			costOfTravell = 4;
 		}
 		
-		int moveValue = (this.costOfPathSoFar + costOfTravell) + heuristicValue;
+		double moveValue = (this.costOfPathSoFar + costOfTravell) + heuristicValue;
 		
 		System.out.println("\t The cost of travell is " + costOfTravell);
 		System.out.println("\t The move value is " + moveValue);
@@ -293,24 +293,26 @@ public class s260430688Player extends Player {
 	 * @param currentMove The move to evaluate.
 	 * @return The value of the heuristic for the current move.
 	 */
-	private int getHeuristicValue(Point position) {
+	private double getHeuristicValue(Point position) {
 		// The heuristic that I am using is the Manhattan distance between the 
 		// current piece and the closest cell in the goal zone.
 		
 		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
-		int smallestDistance = 100;
+		double smallestDistance = 100;
 		
 		int opponentID = this.getOpponentID();
 		if (this.isTokenInOpponentBase(position, opponentID)) {
+			// Returns 0 since the token is already in the opponent's base.
 			smallestDistance = 0;
 		} else {
+			// Returns the shortest distance between the token and the border of the opponent's base.
 			for (int i = 0 ; i < this.borderCellsInGoalZone.length ; i++) {
 				Point boarderPoint = this.borderCellsInGoalZone[i];
 				
 				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
 				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
 				
-				int heuristicValue = (int) Math.floor(Math.sqrt(x+y));
+				double heuristicValue = Math.floor(Math.sqrt(x+y));
 				
 				if (heuristicValue < smallestDistance) {
 					smallestDistance = heuristicValue;
@@ -321,10 +323,4 @@ public class s260430688Player extends Player {
 		System.out.println("\t The heursitic value is " + smallestDistance);
 		return (smallestDistance);
 	}
-	
-	// Try to have a heuristic that would be the combined distance of all the pieces
-	// from their current position to the nearest position of the goal state.
-	
-	// The strategy will be to first do the MiniMax (with pruning) tree and then do the
-	// Monte Carlo search.
 }

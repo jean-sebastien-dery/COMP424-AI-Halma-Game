@@ -12,11 +12,11 @@ import boardgame.Move;
  *
  */
 public class WeightedMove {
-	public int moveValue;
+	public double moveValue;
 	public Move currentMove;
 	public int costOfPathAfterMove;
 	
-	public WeightedMove(Move currentMove, int moveValue) {
+	public WeightedMove(Move currentMove, double moveValue) {
 		this.moveValue = moveValue;
 		this.currentMove = currentMove;
 	}

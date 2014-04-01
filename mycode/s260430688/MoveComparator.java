@@ -14,7 +14,7 @@ import java.util.Comparator;
 public class MoveComparator implements Comparator<WeightedMove> {
 	@Override
 	public int compare(WeightedMove move1, WeightedMove move2) {
-		if (move1.moveValue == move2.moveValue) {
+		if (Math.abs(move1.moveValue - move2.moveValue) < 0.01) {
 			return (0);
 		} else if (move1.moveValue > move2.moveValue) {
 			return (1);
