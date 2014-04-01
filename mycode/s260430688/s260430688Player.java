@@ -8,7 +8,6 @@ import halma.CCMove;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import boardgame.Board;
@@ -37,7 +36,7 @@ public class s260430688Player extends Player {
 	private int costOfPathSoFar = 0;
 	
 	/**
-	 * Defines the number of cells that definest the limit of the goal zone.
+	 * Defines the number of cells that defines the limit of the goal zone.
 	 */
 	private final int NUMBER_OF_BORDER_CELLS_IN_GOAL_ZONE = 5;
 	
@@ -50,42 +49,6 @@ public class s260430688Player extends Player {
 	 * The priority queue that will be used to return the best move at the end of a turn.
 	 */
 	private PriorityQueue<WeightedMove> priorityQueue = null;
-	
-	/**
-	 * This move comparator is used to build a priority queue that is used to select the best move at an iteration.
-	 * 
-	 * @author Jean-Sebastien Dery (260 430 688)
-	 *
-	 */
-	public class MoveComparator implements Comparator<WeightedMove> {
-		@Override
-		public int compare(WeightedMove move1, WeightedMove move2) {
-			if (move1.moveValue == move2.moveValue) {
-				return (0);
-			} else if (move1.moveValue > move2.moveValue) {
-				return (1);
-			} else {
-				return (-1);
-			}
-		}
-	}
-
-	/**
-	 * A container that will be used for the priority queue and stores useful information for the current move.
-	 * 
-	 * @author Jean-Sebastien Dery (260 430 688)
-	 *
-	 */
-	public class WeightedMove {
-		public int moveValue;
-		public Move currentMove;
-		public int costOfPathAfterMove;
-		
-		public WeightedMove(Move currentMove, int moveValue) {
-			this.moveValue = moveValue;
-			this.currentMove = currentMove;
-		}
-	}
 	
 	private boolean isPlayerInitialized = false;
 
@@ -136,17 +99,17 @@ public class s260430688Player extends Player {
     		this.borderCellsInGoalZone[3] = new Point(12, 14);
     		this.borderCellsInGoalZone[4] = new Point(12, 15);
     	} else if (this.playerID == 1) { // Lower left
-    		this.borderCellsInGoalZone[0] = new Point(12, 0);
-    		this.borderCellsInGoalZone[1] = new Point(12, 1);
-    		this.borderCellsInGoalZone[2] = new Point(2, 2);
-    		this.borderCellsInGoalZone[3] = new Point(14, 3);
-    		this.borderCellsInGoalZone[4] = new Point(15, 3);
-    	} else if (this.playerID == 2) { // Upper right
     		this.borderCellsInGoalZone[0] = new Point(0, 12);
     		this.borderCellsInGoalZone[1] = new Point(1, 12);
     		this.borderCellsInGoalZone[2] = new Point(2, 13);
     		this.borderCellsInGoalZone[3] = new Point(3, 14);
-    		this.borderCellsInGoalZone[4] = new Point(4, 15);
+    		this.borderCellsInGoalZone[4] = new Point(3, 15);
+    	} else if (this.playerID == 2) { // Upper right
+    		this.borderCellsInGoalZone[0] = new Point(12, 0);
+    		this.borderCellsInGoalZone[1] = new Point(12, 1);
+    		this.borderCellsInGoalZone[2] = new Point(13, 2);
+    		this.borderCellsInGoalZone[3] = new Point(14, 3);
+    		this.borderCellsInGoalZone[4] = new Point(15, 4);
     	} else if (this.playerID == 3) { // Lower right
     		this.borderCellsInGoalZone[0] = new Point(3, 0);
     		this.borderCellsInGoalZone[1] = new Point(3, 1);
