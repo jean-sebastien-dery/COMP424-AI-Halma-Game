@@ -231,6 +231,10 @@ public class s260430688Player extends Player {
 			costOfTravell = 4;
 		}
 		
+		if (this.isTokenInBase(currentMove.getFrom(), this.getColor())) {
+			costOfTravell = costOfTravell / 2;
+		}
+		
 		double moveValue = (this.costOfPathSoFar + costOfTravell) + heuristicValue;
 		
 		System.out.println("\t The cost of travell is " + costOfTravell);
@@ -279,11 +283,11 @@ public class s260430688Player extends Player {
 	/**
 	 * 
 	 * @param positionOfToken The Point where the token is placed on the chessboard.
-	 * @param opponentID The player's ID of the opponent.
+	 * @param playerID The player's ID of the opponent.
 	 * @return True if the given token is in the opponen'ts base and false otherwise.
 	 */
-	private boolean isTokenInOpponentBase(Point positionOfToken, int opponentID){
-		Integer IDInteger= new Integer(opponentID);
+	private boolean isTokenInBase(Point positionOfToken, int playerID){
+		Integer IDInteger= new Integer(playerID);
 		return (IDInteger.equals(this.board.board.get(positionOfToken)));
 	}
 	
@@ -301,7 +305,7 @@ public class s260430688Player extends Player {
 		double smallestDistance = 100;
 		
 		int opponentID = this.getOpponentID();
-		if (this.isTokenInOpponentBase(position, opponentID)) {
+		if (this.isTokenInBase(position, opponentID)) {
 			// Returns 0 since the token is already in the opponent's base.
 			smallestDistance = 0;
 		} else {
