@@ -257,33 +257,68 @@ public class s260430688Player extends Player {
 	}
 	
 	/**
+	 * 
+	 * @return The oponent's number.
+	 */
+	private int getOpponentID() {
+		switch(this.playerID) {
+			case 0:
+				return (3);
+			case 1:
+				return (2);
+			case 2:
+				return (1);
+			case 3:
+				return (0);
+			default:
+				System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
+				return (0);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param positionOfToken The Point where the token is placed on the chessboard.
+	 * @param opponentID The player's ID of the opponent.
+	 * @return True if the given token is in the opponen'ts base and false otherwise.
+	 */
+	private boolean isTokenInOpponentBase(Point positionOfToken, int opponentID){
+		Integer IDInteger= new Integer(opponentID);
+		return (IDInteger.equals(this.board.board.get(positionOfToken)));
+	}
+	
+	/**
 	 * Will return the heuristic value for the current move.
 	 * 
 	 * @param currentMove The move to evaluate.
 	 * @return The value of the heuristic for the current move.
 	 */
 	private int getHeuristicValue(Point position) {
-		
 		// The heuristic that I am using is the Manhattan distance between the 
 		// current piece and the closest cell in the goal zone.
 		
 		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
 		int smallestDistance = 100;
-		for (int i = 0 ; i < this.borderCellsInGoalZone.length ; i++) {
-			Point boarderPoint = this.borderCellsInGoalZone[i];
-			
-			double x = Math.pow((double)(boarderPoint.x-position.x), 2);
-			double y = Math.pow((double)(boarderPoint.y-position.y), 2);
-			
-			int heuristicValue = (int) Math.floor(Math.sqrt(x+y));
-			
-			if (heuristicValue < smallestDistance) {
-				smallestDistance = heuristicValue;
+		
+		int opponentID = this.getOpponentID();
+		if (this.isTokenInOpponentBase(position, opponentID)) {
+			smallestDistance = 0;
+		} else {
+			for (int i = 0 ; i < this.borderCellsInGoalZone.length ; i++) {
+				Point boarderPoint = this.borderCellsInGoalZone[i];
+				
+				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
+				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
+				
+				int heuristicValue = (int) Math.floor(Math.sqrt(x+y));
+				
+				if (heuristicValue < smallestDistance) {
+					smallestDistance = heuristicValue;
+				}
 			}
 		}
 		
 		System.out.println("\t The heursitic value is " + smallestDistance);
-
 		return (smallestDistance);
 	}
 	
