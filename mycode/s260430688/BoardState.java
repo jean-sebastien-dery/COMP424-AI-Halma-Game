@@ -47,14 +47,16 @@ public class BoardState {
 				}
 			}
 			
-//			// Removes potentialNeighbors that want to go out of the goal zone since it is
-//			// an illegal move.
-//			boolean fromInGoalZone = this.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
-//			boolean toOutOfGoalZone = this.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
-//			if (fromInGoalZone && toOutOfGoalZone) {
-//				listOfNeighbors.remove(i);
-//				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
-//			}
+			// Removes potentialNeighbors that want to go out of the goal zone since it is
+			// an illegal move.
+			boolean fromInGoalZone = this.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
+			boolean toOutOfGoalZone = this.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
+			if (fromInGoalZone && toOutOfGoalZone) {
+				listOfNeighbors.remove(i);
+				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
+			}
+			
+			// TODO: Need to work on how when we terminate a move because it only stops when it cannot do something more.
 		}
 		
 		if (listOfNeighbors.size() == 0) {

@@ -136,7 +136,7 @@ public class s260430688Player extends Player {
 			this.initializePlayer();
 		}
 		
-		if (this.listOfMovesToReachBestState.isEmpty()) {
+		if (this.listOfMovesToReachBestState.isEmpty() || this.listOfMovesToReachBestState.getFirst().getFrom() == null && this.listOfMovesToReachBestState.getFirst().getTo() == null) {
 			ArrayList<Point> allMyTokens = this.board.getPieces(this.playerID);
 			
 			System.out.println("Will start to analyze moves.");
