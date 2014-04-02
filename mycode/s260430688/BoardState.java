@@ -65,17 +65,7 @@ public class BoardState {
 			
 			System.out.println("The list of neighbors is equal to 0.");
 			
-			listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
-			
-			// Evaluate the value of the current configuration.
-			ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
-			
-			// Gets the value of the current configuration.
-			this.valueOfState = this.getHeuristicValueCurrentState(currentTokensConfiguration);
-			
-			System.out.println("The final value of this configuration is " + this.valueOfState);
-			// Updates the priority queue in the Player thread.
-			this.playerBackPointer.updatePriorityQueue(this);
+			this.addCurrentStateToPriorityQueue();
 		} else {
 			// If the size is not 0, it means that we can do more hops and therefore we need to explore
 			// these moves and see what value they will have.
@@ -95,6 +85,20 @@ public class BoardState {
 				newBoardState.exploitState();
 			}
 		}
+	}
+	
+	private void addCurrentStateToPriorityQueue() {
+		listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+		
+		// Evaluate the value of the current configuration.
+		ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
+		
+		// Gets the value of the current configuration.
+		this.valueOfState = this.getHeuristicValueCurrentState(currentTokensConfiguration);
+		
+		System.out.println("The final value of this configuration is " + this.valueOfState);
+		// Updates the priority queue in the Player thread.
+		this.playerBackPointer.updatePriorityQueue(this);
 	}
 	
 	public LinkedList<CCMove> getListOfMoves() {
