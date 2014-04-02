@@ -77,3 +77,5 @@
 149	260430688	random	random	random	Player-1	random	92	game00149.log	ILLEGAL MOVE: Player 0 end turn
 150	260430688	random	random	random	Player-1	random	20	game00150.log	ILLEGAL MOVE: Player 0 end turn
 151	260430688	random	random	random	Player-1	random	19	game00151.log	ILLEGAL MOVE: Player 0 end turn
+157	260430688	random	random	random	Player-0	260430688	100	game00157.log	
+159	260430688	260430681	260430682	260430683	Player-1	260430681	7	game00159.log	DISCONNECTION Player-3

@@ -122,6 +122,9 @@ public class s260430688Player extends Player {
 		}
 		
 		if (this.listOfMovesToReachBestState.isEmpty()) {
+			// Clears the priority queue since it will be different for every move.
+			priorityQueueOfBoardStates.clear();
+			
 			ArrayList<Point> allMyTokens = this.board.getPieces(this.playerID);
 			
 			System.out.println("Will start to analyze moves.");
@@ -133,13 +136,15 @@ public class s260430688Player extends Player {
 			
 			System.out.println("The priority queue is completed.");
 			
-			BoardState bestBoardState = this.priorityQueueOfBoardStates.peek();
-			listOfMovesToReachBestState = bestBoardState.getListOfMoves();
-			
-			System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
-			for (CCMove aMove : this.listOfMovesToReachBestState) {
-				System.out.println(aMove.toPrettyString());
-			}
+			// TODO: need to handle the case where there is no good move.
+			do {
+				BoardState bestBoardState = this.priorityQueueOfBoardStates.poll();
+				listOfMovesToReachBestState = bestBoardState.getListOfMoves();
+				System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
+				for (CCMove aMove : this.listOfMovesToReachBestState) {
+					System.out.println(aMove.toPrettyString());
+				}
+			} while(listOfMovesToReachBestState.isEmpty());
 			
 			return (listOfMovesToReachBestState.removeFirst());
 		} else {
