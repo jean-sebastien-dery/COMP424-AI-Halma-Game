@@ -8,6 +8,7 @@ import halma.CCMove;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import boardgame.Board;
@@ -25,15 +26,15 @@ public class s260430688Player extends Player {
 	 */
 	CCBoard board;
 	
-	/**
-	 * Defines the number of tokens any player has on the board.
-	 */
-	private final int NUMBER_OF_TOKEN_PER_PLAYER = 13;
-	
-	/**
-	 * Defines the cost of the path so far and will be used in the value function.
-	 */
-	private int costOfPathSoFar = 0;
+//	/**
+//	 * Defines the number of tokens any player has on the board.
+//	 */
+//	private final int NUMBER_OF_TOKEN_PER_PLAYER = 13;
+//	
+//	/**
+//	 * Defines the cost of the path so far and will be used in the value function.
+//	 */
+//	private int costOfPathSoFar = 0;
 	
 	/**
 	 * Defines the number of cells that defines the limit of the goal zone.
@@ -45,10 +46,14 @@ public class s260430688Player extends Player {
 	 */
 	private Point[] borderCellsInGoalZone = new Point[NUMBER_OF_BORDER_CELLS_IN_GOAL_ZONE];
 	
-	/**
-	 * The priority queue that will be used to return the best move at the end of a turn.
-	 */
-	private PriorityQueue<WeightedMove> priorityQueue = null;
+//	/**
+//	 * The priority queue that will be used to return the best move at the end of a turn.
+//	 */
+//	private PriorityQueue<WeightedMove> priorityQueue = null;
+	
+	private PriorityQueue<BoardState> priorityQueueOfBoardStates = new PriorityQueue<BoardState>(100, new BoardStateComparator());
+	
+	private LinkedList<CCMove> listOfMovesToReachBestState = new LinkedList<CCMove>();
 	
 	private boolean isPlayerInitialized = false;
 
@@ -121,6 +126,8 @@ public class s260430688Player extends Player {
 
 	@Override
 	public Move chooseMove(Board board) {
+		System.out.println("Need to chose a move.");
+		
 		// Casts the abstract class into its implementation.
 		this.board = (CCBoard) board;
 
@@ -129,199 +136,172 @@ public class s260430688Player extends Player {
 			this.initializePlayer();
 		}
 		
-		// Starts with an empty list of my possible moves.
-		ArrayList<CCMove> allMyPossibleValidMoves = new ArrayList<CCMove>(30);
-		
-		// Gets the list of possible moves for all players given the current configuration of the board.
-		ArrayList<CCMove> moves = this.board.getLegalMoves();
-		
-		// Goes through the set of all possible moves for the current board configuration.
-		for (int i = 0 ; i < moves.size() ; i++) {
-			CCMove moveForCurrentPiece = moves.get(i);
+		if (this.listOfMovesToReachBestState.isEmpty()) {
+			ArrayList<Point> allMyTokens = this.board.getPieces(this.playerID);
 			
-			System.out.println("\nInspecting move number " + (i+1) + " out of " + moves.size() + " possible moves.");
+			System.out.println("Will start to analyze moves.");
 			
-			// Verifies if, in the list of possible moves, there is the token that will inform us that we can end the current turn.
-			if (moveForCurrentPiece.getFrom() == null || moveForCurrentPiece.getTo() == null) {
-				System.out.println("The current move had either its 'from' or 'to' that was null. Ending the turn.");
-				return (new CCMove(this.playerID, null, null));
+			for (Point currentPoint : allMyTokens) {
+				BoardState boardConfiguration = new BoardState(this, (CCBoard) board.clone(), currentPoint, new LinkedList<CCMove>());
+				boardConfiguration.exploitState();
 			}
 			
-			if (CCBoard.getTeamIndex(moveForCurrentPiece.getPlayer_id()) == CCBoard.getTeamIndex(this.getColor())) {
-				// The move is either for one of my piece of my partner.
-				
-				if (moveForCurrentPiece.getPlayer_id() == this.getColor()) {
-					
-					System.out.println("Evaluating a move that starts at: (" + moveForCurrentPiece.getFrom().x + ":" + moveForCurrentPiece.getFrom().y + ")" + " and ends in (" + moveForCurrentPiece.getTo().x + ":" + moveForCurrentPiece.getTo().y + ")");
-					
-					if (this.board.getPieceAt(moveForCurrentPiece.getTo()) != null) {
-						System.out.println("\t This move is not valid since there is a token at the destination. Skipping it.");
-					} else {
-						// The move is for one of my piece so I add it to the array list that contains all my possible moves.
-						allMyPossibleValidMoves.add(moveForCurrentPiece);
-					}
-					
-				} else {
-					// The move is for my partner.
-//					System.out.println("Skipping a move that is for my partner.");
-				}
-				
-			} else {
-				// The move is for one of the opponent.
-//				System.out.println("Skipping a move that is for my opponent.");
-			}
-		}
-		
-		// At this point in the code, I have the list of all the valid moves for my tokens. I need to calculate the current heuristic of all
-		// the moves. The heuristic will be the summation of the Manhattan distance between the token and the closest cell in the goal zone.
-		
-		// Here I am going through all the pieces currently placed in the board to have the cumulated Manhattan distance for all the pieces.
-		int heuristicValueBeforeMove = 0;
-		ArrayList<Point> allMyPieces = this.board.getPieces(this.playerID);
-		for (Point currentToken : allMyPieces) {
-			heuristicValueBeforeMove += this.getHeuristicValue(currentToken);
-		}
-		
-		System.out.println("The current heuristic value of the board configuration before a move is " + heuristicValueBeforeMove);
-		
-		// Here I am going through all my possible moves and compute the current heuristic after the move has been executed.
-
-		// Creating an empty queue that will be used to determine the move to play.
-		this.priorityQueue = new PriorityQueue<WeightedMove>(board.getNumberOfPlayers()*NUMBER_OF_TOKEN_PER_PLAYER, new MoveComparator());
-		
-		for (CCMove currentMove : allMyPossibleValidMoves) {
-			double heuristicValueAfterCurrentMove = heuristicValueBeforeMove - this.getHeuristicValue(currentMove.getFrom()) + this.getHeuristicValue(currentMove.getTo());
-			double valueOfMove = this.giveMoveValue(currentMove, heuristicValueAfterCurrentMove);
+			System.out.println("The priority queue is completed.");
 			
-			WeightedMove currentWeightedMove = new WeightedMove(currentMove, valueOfMove);
-			this.priorityQueue.add(currentWeightedMove);
-		}
-		
-		// After I have built the priority queue, I need to make a decision so I take the move that has the lowest value in the queue.
-		
-		WeightedMove moveToReturn = this.priorityQueue.peek();
-		this.costOfPathSoFar += moveToReturn.costOfPathAfterMove;
-		
-		System.out.println("The value of the move returned is " + moveToReturn.moveValue);
-		
-		return (moveToReturn.currentMove);
-	}
-	
-	/**
-	 * Will give the value of the current move based on the value function f(x) = g(x) + h(x)
-	 * 
-	 * @param currentMove The move to evaluate.
-	 * @return The value of the current move.
-	 */
-	private double giveMoveValue(CCMove currentMove, double heuristicValue) {
-		// Here I increment the cost of path by one because I want to encourage moves
-		// that goes over another token.
-		
-		int travelledDistance = giveTravelledDistanceForMove(currentMove.getFrom(), currentMove.getTo());
-		
-		int costOfTravell;
-		if (travelledDistance == 1) {
-			costOfTravell = 4;
-		} else if (travelledDistance == 2) {
-			costOfTravell = 2;
+			BoardState bestBoardState = this.priorityQueueOfBoardStates.peek();
+			listOfMovesToReachBestState = bestBoardState.getListOfMoves();
+			
+			return (listOfMovesToReachBestState.removeFirst());
 		} else {
-			costOfTravell = 4;
+			return (listOfMovesToReachBestState.removeFirst());
 		}
 		
-		if (this.isTokenInBase(currentMove.getFrom(), this.getColor())) {
-			costOfTravell = costOfTravell / 2;
-		}
-		
-		double moveValue = (this.costOfPathSoFar + costOfTravell) + heuristicValue;
-		
-		System.out.println("\t The cost of travell is " + costOfTravell);
-		System.out.println("\t The move value is " + moveValue);
-		
-		return (moveValue);
+//		// Starts with an empty list of my possible moves.
+//		ArrayList<CCMove> allMyPossibleValidMoves = new ArrayList<CCMove>(30);
+//		
+//		// Gets the list of possible moves for all players given the current configuration of the board.
+//		ArrayList<CCMove> moves = this.board.getLegalMoves();
+//		
+//		// Goes through the set of all possible moves for the current board configuration.
+//		for (int i = 0 ; i < moves.size() ; i++) {
+//			CCMove moveForCurrentPiece = moves.get(i);
+//			
+//			System.out.println("\nInspecting move number " + (i+1) + " out of " + moves.size() + " possible moves.");
+//			
+//			// Verifies if, in the list of possible moves, there is the token that will inform us that we can end the current turn.
+//			if (moveForCurrentPiece.getFrom() == null || moveForCurrentPiece.getTo() == null) {
+//				System.out.println("The current move had either its 'from' or 'to' that was null. Ending the turn.");
+//				return (new CCMove(this.playerID, null, null));
+//			}
+//			
+//			if (CCBoard.getTeamIndex(moveForCurrentPiece.getPlayer_id()) == CCBoard.getTeamIndex(this.getColor())) {
+//				// The move is either for one of my piece of my partner.
+//				
+//				if (moveForCurrentPiece.getPlayer_id() == this.getColor()) {
+//					
+//					System.out.println("Evaluating a move that starts at: (" + moveForCurrentPiece.getFrom().x + ":" + moveForCurrentPiece.getFrom().y + ")" + " and ends in (" + moveForCurrentPiece.getTo().x + ":" + moveForCurrentPiece.getTo().y + ")");
+//					
+//					if (this.board.getPieceAt(moveForCurrentPiece.getTo()) != null) {
+//						System.out.println("\t This move is not valid since there is a token at the destination. Skipping it.");
+//					} else {
+//						// The move is for one of my piece so I add it to the array list that contains all my possible moves.
+//						allMyPossibleValidMoves.add(moveForCurrentPiece);
+//					}
+//					
+//				} else {
+//					// The move is for my partner.
+////					System.out.println("Skipping a move that is for my partner.");
+//				}
+//				
+//			} else {
+//				// The move is for one of the opponent.
+////				System.out.println("Skipping a move that is for my opponent.");
+//			}
+//		}
+//		
+//		// At this point in the code, I have the list of all the valid moves for my tokens. I need to calculate the current heuristic of all
+//		// the moves. The heuristic will be the summation of the Manhattan distance between the token and the closest cell in the goal zone.
+//		
+//		// Here I am going through all the pieces currently placed in the board to have the cumulated Manhattan distance for all the pieces.
+//		int heuristicValueBeforeMove = 0;
+//		ArrayList<Point> allMyPieces = this.board.getPieces(this.playerID);
+//		for (Point currentToken : allMyPieces) {
+//			heuristicValueBeforeMove += this.getHeuristicValue(currentToken);
+//		}
+//		
+//		System.out.println("The current heuristic value of the board configuration before a move is " + heuristicValueBeforeMove);
+//		
+//		// Here I am going through all my possible moves and compute the current heuristic after the move has been executed.
+//
+//		// Creating an empty queue that will be used to determine the move to play.
+//		this.priorityQueue = new PriorityQueue<WeightedMove>(board.getNumberOfPlayers()*NUMBER_OF_TOKEN_PER_PLAYER, new MoveComparator());
+//		
+//		for (CCMove currentMove : allMyPossibleValidMoves) {
+//			double heuristicValueAfterCurrentMove = heuristicValueBeforeMove - this.getHeuristicValue(currentMove.getFrom()) + this.getHeuristicValue(currentMove.getTo());
+//			double valueOfMove = this.giveMoveValue(currentMove, heuristicValueAfterCurrentMove);
+//			
+//			WeightedMove currentWeightedMove = new WeightedMove(currentMove, valueOfMove);
+//			this.priorityQueue.add(currentWeightedMove);
+//		}
+//		
+//		
+//		// After I have built the priority queue, I need to make a decision so I take the move that has the lowest value in the queue.
+//		
+//		WeightedMove moveToReturn = this.priorityQueue.peek();
+//		this.costOfPathSoFar += moveToReturn.costOfPathAfterMove;
+//		
+//		System.out.println("The value of the move returned is " + moveToReturn.moveValue);
+//		
+//		return (moveToReturn.currentMove);
 	}
 	
 	/**
-	 * Returns the traveled distance for a given move.
+	 * Note that this is not synchronized since it is read only and immutable after the game starts.
 	 * 
-	 * @param currentMove The move to analyze.
-	 * @return The distance the token will travel after the move will be executed.
+	 * @return The cells that define the goal zone.
 	 */
-	private int giveTravelledDistanceForMove(Point start, Point end) {
-		double x = Math.pow((double)(start.x-end.x), 2);
-		double y = Math.pow((double)(start.y-end.y), 2);
-		
-		int travelledDistance = (int) Math.floor(Math.sqrt(x+y));
-		
-		System.out.println("\t The travelled distance will be " + travelledDistance);
-
-		return (travelledDistance);
+	public Point[] getBorderCellsInGoalZone() {
+		return (this.borderCellsInGoalZone);
 	}
 	
 	/**
+	 * Updates the board state priority queue that will be used to make a decision.
 	 * 
-	 * @return The oponent's number.
+	 * @param boardState
 	 */
-	private int getOpponentID() {
-		switch(this.playerID) {
-			case 0:
-				return (3);
-			case 1:
-				return (2);
-			case 2:
-				return (1);
-			case 3:
-				return (0);
-			default:
-				System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
-				return (0);
+	public void updatePriorityQueue(BoardState boardState) {
+		synchronized(this.priorityQueueOfBoardStates) {
+			this.priorityQueueOfBoardStates.add(boardState);
 		}
 	}
 	
-	/**
-	 * 
-	 * @param positionOfToken The Point where the token is placed on the chessboard.
-	 * @param playerID The player's ID of the opponent.
-	 * @return True if the given token is in the opponen'ts base and false otherwise.
-	 */
-	private boolean isTokenInBase(Point positionOfToken, int playerID){
-		Integer IDInteger= new Integer(playerID);
-		return (IDInteger.equals(this.board.board.get(positionOfToken)));
-	}
-	
-	/**
-	 * Will return the heuristic value for the current move.
-	 * 
-	 * @param currentMove The move to evaluate.
-	 * @return The value of the heuristic for the current move.
-	 */
-	private double getHeuristicValue(Point position) {
-		// The heuristic that I am using is the Manhattan distance between the 
-		// current piece and the closest cell in the goal zone.
-		
-		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
-		double smallestDistance = 100;
-		
-		int opponentID = this.getOpponentID();
-		if (this.isTokenInBase(position, opponentID)) {
-			// Returns 0 since the token is already in the opponent's base.
-			smallestDistance = 0;
-		} else {
-			// Returns the shortest distance between the token and the border of the opponent's base.
-			for (int i = 0 ; i < this.borderCellsInGoalZone.length ; i++) {
-				Point boarderPoint = this.borderCellsInGoalZone[i];
-				
-				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
-				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
-				
-				double heuristicValue = Math.floor(Math.sqrt(x+y));
-				
-				if (heuristicValue < smallestDistance) {
-					smallestDistance = heuristicValue;
-				}
-			}
-		}
-		
-		System.out.println("\t The heursitic value is " + smallestDistance);
-		return (smallestDistance);
-	}
+//	/**
+//	 * Will give the value of the current move based on the value function f(x) = g(x) + h(x)
+//	 * 
+//	 * @param currentMove The move to evaluate.
+//	 * @return The value of the current move.
+//	 */
+//	private double giveMoveValue(CCMove currentMove, double heuristicValue) {
+//		// Here I increment the cost of path by one because I want to encourage moves
+//		// that goes over another token.
+//		
+//		int travelledDistance = giveTravelledDistanceForMove(currentMove.getFrom(), currentMove.getTo());
+//		
+//		int costOfTravell;
+//		if (travelledDistance == 1) {
+//			costOfTravell = 4;
+//		} else if (travelledDistance == 2) {
+//			costOfTravell = 2;
+//		} else {
+//			costOfTravell = 4;
+//		}
+//		
+//		if (this.isTokenInBase(currentMove.getFrom(), this.getColor())) {
+//			costOfTravell = costOfTravell / 2;
+//		}
+//		
+//		double moveValue = (this.costOfPathSoFar + costOfTravell) + heuristicValue;
+//		
+//		System.out.println("\t The cost of travell is " + costOfTravell);
+//		System.out.println("\t The move value is " + moveValue);
+//		
+//		return (moveValue);
+//	}
+//	
+//	/**
+//	 * Returns the traveled distance for a given move.
+//	 * 
+//	 * @param currentMove The move to analyze.
+//	 * @return The distance the token will travel after the move will be executed.
+//	 */
+//	private int giveTravelledDistanceForMove(Point start, Point end) {
+//		double x = Math.pow((double)(start.x-end.x), 2);
+//		double y = Math.pow((double)(start.y-end.y), 2);
+//		
+//		int travelledDistance = (int) Math.floor(Math.sqrt(x+y));
+//		
+//		System.out.println("\t The travelled distance will be " + travelledDistance);
+//
+//		return (travelledDistance);
+//	}
 }

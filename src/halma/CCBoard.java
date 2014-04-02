@@ -273,7 +273,7 @@ public class CCBoard extends Board{
 		legal &= !board.containsKey(m.to);
 
 		// check if the move is a hop and legal
-		boolean h= m.isHop();
+		boolean h = m.isHop();
 		legal &= !h || (h && board.containsKey(m.getMid()) && ((lastMovedInTurn == null) || lastMovedInTurn.equals(m.from)));
 
 		// check if the move is a simple move and if it is allowed
