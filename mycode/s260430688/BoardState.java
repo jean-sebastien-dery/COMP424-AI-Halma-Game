@@ -55,8 +55,6 @@ public class BoardState {
 				listOfNeighbors.remove(i);
 				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
 			}
-			
-			// TODO: Need to work on how when we terminate a move because it only stops when it cannot do something more.
 		}
 		
 		if (listOfNeighbors.size() == 0) {
@@ -70,7 +68,7 @@ public class BoardState {
 			// If the size is not 0, it means that we can do more hops and therefore we need to explore
 			// these moves and see what value they will have.
 			for (CCMove moveToExecute : listOfNeighbors) {
-				System.out.println("Creating a new configuration for move that starts from "+moveToExecute.getFrom().toString()+" and ends in "+moveToExecute.getTo().toString()+".");		
+				System.out.println("Creating a new state for move that starts from "+moveToExecute.getFrom().toString()+" and ends in "+moveToExecute.getTo().toString()+".");		
 				// Create a copy of the current board configuration.
 				CCBoard copyOfBoard = (CCBoard) this.currentState.clone();
 				// Executes the move on the copy of the board.
@@ -79,7 +77,7 @@ public class BoardState {
 				@SuppressWarnings("unchecked")
 				LinkedList<CCMove> newListOfPreviousMoves = (LinkedList<CCMove>) this.listOfPreviousMoves.clone();
 				newListOfPreviousMoves.add(moveToExecute);
-				// Creates a new instance of the board configuration so that we potentially can exploid
+				// Creates a new instance of the board state so that we potentially can exploid
 				// more hops.
 				BoardState newBoardState = new BoardState(this.playerBackPointer, copyOfBoard, moveToExecute.getTo(), newListOfPreviousMoves);
 				newBoardState.exploitState();
@@ -89,7 +87,12 @@ public class BoardState {
 	
 	private void addCurrentStateToPriorityQueue() {
 		if (!this.listOfPreviousMoves.isEmpty()) {
-			listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+			
+			// So here the NULL move must only be added whenever the last move was a hop since this is how the server gets informed
+			// that the turn is now over. If the last move is not a hop, the NULL move must not be added.
+			if (this.listOfPreviousMoves.getLast().isHop()) {
+				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+			}
 			
 			// Evaluate the value of the current configuration.
 			ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
@@ -100,8 +103,13 @@ public class BoardState {
 			System.out.println("The final value of this configuration is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.
 			this.playerBackPointer.updatePriorityQueue(this);
+
+			System.out.println("List of moves in order to reach this state:");
+			for (CCMove aMove : this.listOfPreviousMoves) {
+				System.out.println(aMove.toPrettyString());
+			}
 		} else {
-			System.out.println("Detedcted that no moves were made to read this state so it will be ignored.");
+			System.out.println("Detected that no moves were made to reach this state so it will be ignored.");
 		}
 	}
 	

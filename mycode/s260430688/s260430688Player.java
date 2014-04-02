@@ -121,7 +121,7 @@ public class s260430688Player extends Player {
 			this.initializePlayer();
 		}
 		
-		if (this.listOfMovesToReachBestState.isEmpty() || this.listOfMovesToReachBestState.getFirst().getFrom() == null && this.listOfMovesToReachBestState.getFirst().getTo() == null) {
+		if (this.listOfMovesToReachBestState.isEmpty()) {
 			ArrayList<Point> allMyTokens = this.board.getPieces(this.playerID);
 			
 			System.out.println("Will start to analyze moves.");
@@ -135,6 +135,11 @@ public class s260430688Player extends Player {
 			
 			BoardState bestBoardState = this.priorityQueueOfBoardStates.peek();
 			listOfMovesToReachBestState = bestBoardState.getListOfMoves();
+			
+			System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
+			for (CCMove aMove : this.listOfMovesToReachBestState) {
+				System.out.println(aMove.toPrettyString());
+			}
 			
 			return (listOfMovesToReachBestState.removeFirst());
 		} else {
