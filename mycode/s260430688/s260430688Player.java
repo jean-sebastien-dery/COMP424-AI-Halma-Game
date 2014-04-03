@@ -34,7 +34,7 @@ public class s260430688Player extends Player {
 	/**
 	 * This reference point will be used to compute the heuristic of the value function.
 	 */
-	private Point[] borderCellsInGoalZone = new Point[NUMBER_OF_BORDER_CELLS_IN_GOAL_ZONE];
+	private Point[] borderCellsInGoalZone = new Point[1];
 
 	private PriorityQueue<BoardState> priorityQueueOfBoardStates = new PriorityQueue<BoardState>(100, new BoardStateComparator());
 	
@@ -75,10 +75,6 @@ public class s260430688Player extends Player {
         	// the current configuration of the board.
     		System.err.println("The board was not properly set, cannot initialize the player.");
     		this.borderCellsInGoalZone[0] = new Point(7, 7);
-    		this.borderCellsInGoalZone[1] = new Point(7, 7);
-    		this.borderCellsInGoalZone[2] = new Point(7, 7);
-    		this.borderCellsInGoalZone[3] = new Point(7, 7);
-    		this.borderCellsInGoalZone[4] = new Point(7, 7);
     		return;
     	}
     	
@@ -90,10 +86,6 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(12, 14);
 //    		this.borderCellsInGoalZone[4] = new Point(12, 15);
     		this.borderCellsInGoalZone[0] = new Point(15, 15);
-    		this.borderCellsInGoalZone[1] = new Point(15, 15);
-    		this.borderCellsInGoalZone[2] = new Point(15, 15);
-    		this.borderCellsInGoalZone[3] = new Point(15, 15);
-    		this.borderCellsInGoalZone[4] = new Point(15, 15);
     	} else if (this.playerID == 1) { // Lower left
 //    		this.borderCellsInGoalZone[0] = new Point(0, 12);
 //    		this.borderCellsInGoalZone[1] = new Point(1, 12);
@@ -101,10 +93,6 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(3, 14);
 //    		this.borderCellsInGoalZone[4] = new Point(3, 15);
     		this.borderCellsInGoalZone[0] = new Point(0, 15);
-    		this.borderCellsInGoalZone[1] = new Point(0, 15);
-    		this.borderCellsInGoalZone[2] = new Point(0, 15);
-    		this.borderCellsInGoalZone[3] = new Point(0, 15);
-    		this.borderCellsInGoalZone[4] = new Point(0, 15);
     	} else if (this.playerID == 2) { // Upper right
 //    		this.borderCellsInGoalZone[0] = new Point(12, 0);
 //    		this.borderCellsInGoalZone[1] = new Point(12, 1);
@@ -112,10 +100,6 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(14, 3);
 //    		this.borderCellsInGoalZone[4] = new Point(15, 4);
     		this.borderCellsInGoalZone[0] = new Point(15, 0);
-    		this.borderCellsInGoalZone[1] = new Point(15, 0);
-    		this.borderCellsInGoalZone[2] = new Point(15, 0);
-    		this.borderCellsInGoalZone[3] = new Point(15, 0);
-    		this.borderCellsInGoalZone[4] = new Point(15, 0);
     	} else if (this.playerID == 3) { // Lower right
 //    		this.borderCellsInGoalZone[0] = new Point(3, 0);
 //    		this.borderCellsInGoalZone[1] = new Point(3, 1);
@@ -123,10 +107,6 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(0, 3);
 //    		this.borderCellsInGoalZone[4] = new Point(1, 3);
     		this.borderCellsInGoalZone[0] = new Point(0, 0);
-    		this.borderCellsInGoalZone[1] = new Point(0, 0);
-    		this.borderCellsInGoalZone[2] = new Point(0, 0);
-    		this.borderCellsInGoalZone[3] = new Point(0, 0);
-    		this.borderCellsInGoalZone[4] = new Point(0, 0);
     	}
     }
 
@@ -142,7 +122,7 @@ public class s260430688Player extends Player {
 			this.initializePlayer();
 		}
 		
-		if (this.listOfMovesToReachBestState.isEmpty()) {			
+		if (this.listOfMovesToReachBestState.isEmpty()) {
 			// Clears the priority queue since it will be different for every move.
 			priorityQueueOfBoardStates.clear();
 			
@@ -181,10 +161,6 @@ public class s260430688Player extends Player {
 			// If we are here it means that we have not reached the desired state yet.
 			return (listOfMovesToReachBestState.removeFirst());
 		}
-	}
-	
-	private void updatePositionsUsedByHeuristic(Point finalDestinationOfMove) {
-		
 	}
 	
 	/**
