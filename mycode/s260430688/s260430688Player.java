@@ -41,6 +41,8 @@ public class s260430688Player extends Player {
 	private LinkedList<CCMove> listOfMovesToReachBestState = new LinkedList<CCMove>();
 	
 	private boolean isPlayerInitialized = false;
+	
+	private int goalPlayerID;
 
 	/**
 	 * Constructor.
@@ -108,6 +110,20 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[4] = new Point(1, 3);
     		this.borderCellsInGoalZone[0] = new Point(0, 0);
     	}
+    	
+    	switch(this.playerID) {
+    		case 0:
+    			this.goalPlayerID = 3;
+    		case 1:
+    			this.goalPlayerID = 2;
+    		case 2:
+    			this.goalPlayerID = 1;
+    		case 3:
+    			this.goalPlayerID = 0;
+    		default:
+    			System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
+    			this.goalPlayerID = 0;
+    	}
     }
 
 	@Override
@@ -125,6 +141,8 @@ public class s260430688Player extends Player {
 		if (this.listOfMovesToReachBestState.isEmpty()) {
 			// Clears the priority queue since it will be different for every move.
 			priorityQueueOfBoardStates.clear();
+			
+			this.updatePointsUsedByHeuristic();
 			
 			ArrayList<Point> allMyTokens = this.board.getPieces(this.playerID);
 			
@@ -163,6 +181,10 @@ public class s260430688Player extends Player {
 		}
 	}
 	
+	private void updatePointsUsedByHeuristic() {
+		
+	}
+	
 	/**
 	 * 
 	 * @param positionOfToken The Point where the token is placed on the chessboard.
@@ -172,26 +194,6 @@ public class s260430688Player extends Player {
 	private boolean isTokenInBaseOfPlayer(Point positionOfToken, int playerID){
 		Integer IDInteger= new Integer(playerID);
 		return (IDInteger.equals(this.board.board.get(positionOfToken)));
-	}
-	
-	/**
-	 * 
-	 * @return The oponent's number.
-	 */
-	private int getOpponentID() {
-		switch(this.playerID) {
-			case 0:
-				return (3);
-			case 1:
-				return (2);
-			case 2:
-				return (1);
-			case 3:
-				return (0);
-			default:
-				System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
-				return (0);
-		}
 	}
 	
 	/**
