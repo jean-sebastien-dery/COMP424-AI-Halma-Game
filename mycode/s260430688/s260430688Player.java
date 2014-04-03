@@ -78,34 +78,55 @@ public class s260430688Player extends Player {
     		this.borderCellsInGoalZone[1] = new Point(7, 7);
     		this.borderCellsInGoalZone[2] = new Point(7, 7);
     		this.borderCellsInGoalZone[3] = new Point(7, 7);
+    		this.borderCellsInGoalZone[4] = new Point(7, 7);
     		return;
     	}
     	
     	// Sets the point that will be used for to calculate the heuristic.
     	if (this.playerID == 0) { // Upper left
-    		this.borderCellsInGoalZone[0] = new Point(15, 12);
-    		this.borderCellsInGoalZone[1] = new Point(14, 12);
-    		this.borderCellsInGoalZone[2] = new Point(13, 13);
-    		this.borderCellsInGoalZone[3] = new Point(12, 14);
-    		this.borderCellsInGoalZone[4] = new Point(12, 15);
+//    		this.borderCellsInGoalZone[0] = new Point(15, 12);
+//    		this.borderCellsInGoalZone[1] = new Point(14, 12);
+//    		this.borderCellsInGoalZone[2] = new Point(13, 13);
+//    		this.borderCellsInGoalZone[3] = new Point(12, 14);
+//    		this.borderCellsInGoalZone[4] = new Point(12, 15);
+    		this.borderCellsInGoalZone[0] = new Point(15, 15);
+    		this.borderCellsInGoalZone[1] = new Point(15, 15);
+    		this.borderCellsInGoalZone[2] = new Point(15, 15);
+    		this.borderCellsInGoalZone[3] = new Point(15, 15);
+    		this.borderCellsInGoalZone[4] = new Point(15, 15);
     	} else if (this.playerID == 1) { // Lower left
-    		this.borderCellsInGoalZone[0] = new Point(0, 12);
-    		this.borderCellsInGoalZone[1] = new Point(1, 12);
-    		this.borderCellsInGoalZone[2] = new Point(2, 13);
-    		this.borderCellsInGoalZone[3] = new Point(3, 14);
-    		this.borderCellsInGoalZone[4] = new Point(3, 15);
+//    		this.borderCellsInGoalZone[0] = new Point(0, 12);
+//    		this.borderCellsInGoalZone[1] = new Point(1, 12);
+//    		this.borderCellsInGoalZone[2] = new Point(2, 13);
+//    		this.borderCellsInGoalZone[3] = new Point(3, 14);
+//    		this.borderCellsInGoalZone[4] = new Point(3, 15);
+    		this.borderCellsInGoalZone[0] = new Point(0, 15);
+    		this.borderCellsInGoalZone[1] = new Point(0, 15);
+    		this.borderCellsInGoalZone[2] = new Point(0, 15);
+    		this.borderCellsInGoalZone[3] = new Point(0, 15);
+    		this.borderCellsInGoalZone[4] = new Point(0, 15);
     	} else if (this.playerID == 2) { // Upper right
-    		this.borderCellsInGoalZone[0] = new Point(12, 0);
-    		this.borderCellsInGoalZone[1] = new Point(12, 1);
-    		this.borderCellsInGoalZone[2] = new Point(13, 2);
-    		this.borderCellsInGoalZone[3] = new Point(14, 3);
-    		this.borderCellsInGoalZone[4] = new Point(15, 4);
+//    		this.borderCellsInGoalZone[0] = new Point(12, 0);
+//    		this.borderCellsInGoalZone[1] = new Point(12, 1);
+//    		this.borderCellsInGoalZone[2] = new Point(13, 2);
+//    		this.borderCellsInGoalZone[3] = new Point(14, 3);
+//    		this.borderCellsInGoalZone[4] = new Point(15, 4);
+    		this.borderCellsInGoalZone[0] = new Point(15, 0);
+    		this.borderCellsInGoalZone[1] = new Point(15, 0);
+    		this.borderCellsInGoalZone[2] = new Point(15, 0);
+    		this.borderCellsInGoalZone[3] = new Point(15, 0);
+    		this.borderCellsInGoalZone[4] = new Point(15, 0);
     	} else if (this.playerID == 3) { // Lower right
-    		this.borderCellsInGoalZone[0] = new Point(3, 0);
-    		this.borderCellsInGoalZone[1] = new Point(3, 1);
-    		this.borderCellsInGoalZone[2] = new Point(2, 2);
-    		this.borderCellsInGoalZone[3] = new Point(0, 3);
-    		this.borderCellsInGoalZone[4] = new Point(1, 3);
+//    		this.borderCellsInGoalZone[0] = new Point(3, 0);
+//    		this.borderCellsInGoalZone[1] = new Point(3, 1);
+//    		this.borderCellsInGoalZone[2] = new Point(2, 2);
+//    		this.borderCellsInGoalZone[3] = new Point(0, 3);
+//    		this.borderCellsInGoalZone[4] = new Point(1, 3);
+    		this.borderCellsInGoalZone[0] = new Point(0, 0);
+    		this.borderCellsInGoalZone[1] = new Point(0, 0);
+    		this.borderCellsInGoalZone[2] = new Point(0, 0);
+    		this.borderCellsInGoalZone[3] = new Point(0, 0);
+    		this.borderCellsInGoalZone[4] = new Point(0, 0);
     	}
     }
 
@@ -121,7 +142,7 @@ public class s260430688Player extends Player {
 			this.initializePlayer();
 		}
 		
-		if (this.listOfMovesToReachBestState.isEmpty()) {
+		if (this.listOfMovesToReachBestState.isEmpty()) {			
 			// Clears the priority queue since it will be different for every move.
 			priorityQueueOfBoardStates.clear();
 			
@@ -136,19 +157,64 @@ public class s260430688Player extends Player {
 			
 			System.out.println("The priority queue is completed.");
 			
-			// TODO: need to handle the case where there is no good move.
-			do {
-				BoardState bestBoardState = this.priorityQueueOfBoardStates.poll();
-				listOfMovesToReachBestState = bestBoardState.getListOfMoves();
-				System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
-				for (CCMove aMove : this.listOfMovesToReachBestState) {
-					System.out.println(aMove.toPrettyString());
-				}
-			} while(listOfMovesToReachBestState.isEmpty());
-			
-			return (listOfMovesToReachBestState.removeFirst());
+			if (!this.priorityQueueOfBoardStates.isEmpty()) {
+				
+				// TODO: need to handle the case where there is no good move.
+				do {
+					// Pops the best desired state in the priority queue.
+					BoardState bestBoardState = this.priorityQueueOfBoardStates.poll();
+					listOfMovesToReachBestState = bestBoardState.getListOfMoves();
+					System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
+					for (CCMove aMove : this.listOfMovesToReachBestState) {
+						System.out.println(aMove.toPrettyString());
+					}
+				} while(listOfMovesToReachBestState.isEmpty());
+				
+				return (listOfMovesToReachBestState.removeFirst());
+				
+			} else {
+				// If the priority queue is empty, it means that all the tokens are at the goal zone.
+				System.out.println("All the tokens are in the goal zone so the game is over.");
+				return (new CCMove(this.playerID, null, null));
+			}
 		} else {
+			// If we are here it means that we have not reached the desired state yet.
 			return (listOfMovesToReachBestState.removeFirst());
+		}
+	}
+	
+	private void updatePositionsUsedByHeuristic(Point finalDestinationOfMove) {
+		
+	}
+	
+	/**
+	 * 
+	 * @param positionOfToken The Point where the token is placed on the chessboard.
+	 * @param playerID The player's ID of the opponent.
+	 * @return True if the given token is in the opponen'ts base and false otherwise.
+	 */
+	private boolean isTokenInBaseOfPlayer(Point positionOfToken, int playerID){
+		Integer IDInteger= new Integer(playerID);
+		return (IDInteger.equals(this.board.board.get(positionOfToken)));
+	}
+	
+	/**
+	 * 
+	 * @return The oponent's number.
+	 */
+	private int getOpponentID() {
+		switch(this.playerID) {
+			case 0:
+				return (3);
+			case 1:
+				return (2);
+			case 2:
+				return (1);
+			case 3:
+				return (0);
+			default:
+				System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
+				return (0);
 		}
 	}
 	
