@@ -42,7 +42,7 @@ public class s260430688Player extends Player {
 	
 	private boolean isPlayerInitialized = false;
 	
-	private int goalPlayerID;
+	private int goalPlayerID = 0;
 
 	/**
 	 * Constructor.
@@ -88,6 +88,7 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(12, 14);
 //    		this.borderCellsInGoalZone[4] = new Point(12, 15);
     		this.borderCellsInGoalZone[0] = new Point(15, 15);
+    		this.goalPlayerID = 3;
     	} else if (this.playerID == 1) { // Lower left
 //    		this.borderCellsInGoalZone[0] = new Point(0, 12);
 //    		this.borderCellsInGoalZone[1] = new Point(1, 12);
@@ -95,6 +96,7 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(3, 14);
 //    		this.borderCellsInGoalZone[4] = new Point(3, 15);
     		this.borderCellsInGoalZone[0] = new Point(0, 15);
+    		this.goalPlayerID = 2;
     	} else if (this.playerID == 2) { // Upper right
 //    		this.borderCellsInGoalZone[0] = new Point(12, 0);
 //    		this.borderCellsInGoalZone[1] = new Point(12, 1);
@@ -102,6 +104,7 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(14, 3);
 //    		this.borderCellsInGoalZone[4] = new Point(15, 4);
     		this.borderCellsInGoalZone[0] = new Point(15, 0);
+    		this.goalPlayerID = 1;
     	} else if (this.playerID == 3) { // Lower right
 //    		this.borderCellsInGoalZone[0] = new Point(3, 0);
 //    		this.borderCellsInGoalZone[1] = new Point(3, 1);
@@ -109,20 +112,7 @@ public class s260430688Player extends Player {
 //    		this.borderCellsInGoalZone[3] = new Point(0, 3);
 //    		this.borderCellsInGoalZone[4] = new Point(1, 3);
     		this.borderCellsInGoalZone[0] = new Point(0, 0);
-    	}
-    	
-    	switch(this.playerID) {
-    		case 0:
-    			this.goalPlayerID = 3;
-    		case 1:
-    			this.goalPlayerID = 2;
-    		case 2:
-    			this.goalPlayerID = 1;
-    		case 3:
-    			this.goalPlayerID = 0;
-    		default:
-    			System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
-    			this.goalPlayerID = 0;
+    		this.goalPlayerID = 0;
     	}
     }
 
@@ -191,7 +181,7 @@ public class s260430688Player extends Player {
 	 * @param playerID The player's ID of the opponent.
 	 * @return True if the given token is in the opponen'ts base and false otherwise.
 	 */
-	private boolean isTokenInBaseOfPlayer(Point positionOfToken, int playerID){
+	public boolean isTokenInBaseOfPlayer(Point positionOfToken, int playerID){
 		Integer IDInteger= new Integer(playerID);
 		return (IDInteger.equals(this.board.board.get(positionOfToken)));
 	}
@@ -214,5 +204,51 @@ public class s260430688Player extends Player {
 		synchronized(this.priorityQueueOfBoardStates) {
 			this.priorityQueueOfBoardStates.add(boardState);
 		}
+	}
+	
+	public double getHeuristicValueCurrentState(ArrayList<Point> currentStateTokens) {
+		double heuristicValueBeforeMove = 0;
+		for (Point aToken : currentStateTokens) {
+			heuristicValueBeforeMove += this.getHeuristicValueForToken(aToken);
+		}
+		return (heuristicValueBeforeMove);
+	}
+	
+	/**
+	 * Will return the heuristic value for the current move.
+	 * 
+	 * @param currentMove The move to evaluate.
+	 * @return The value of the heuristic for the current move.
+	 */
+	public double getHeuristicValueForToken(Point position) {
+		// The heuristic that I am using is the Manhattan distance between the 
+		// current piece and the closest cell in the goal zone.
+		
+		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
+		double smallestDistance = 100;
+		
+		if (this.isTokenInBaseOfPlayer(position, this.goalPlayerID)) {
+			// Returns 0 since the token is already in the opponent's base.
+			System.out.println("The heuristic will be 0 because it is in the goal zone for point " + position.toString());
+			smallestDistance = 0;
+		} else {
+			Point[] borderCellsInGoalZone = this.getBorderCellsInGoalZone();
+			// Returns the shortest distance between the token and the border of the opponent's base.
+			for (int i = 0 ; i < borderCellsInGoalZone.length ; i++) {
+				Point boarderPoint = borderCellsInGoalZone[i];
+				
+				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
+				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
+				
+				double heuristicValue = Math.floor(Math.sqrt(x+y));
+				
+				if (heuristicValue < smallestDistance) {
+					smallestDistance = heuristicValue;
+				}
+			}
+		}
+		
+		System.out.println("\t The heursitic value is " + smallestDistance + " for token at " + position.toString());
+		return (smallestDistance);
 	}
 }

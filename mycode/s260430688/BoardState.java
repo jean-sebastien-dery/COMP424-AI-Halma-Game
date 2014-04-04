@@ -49,8 +49,8 @@ public class BoardState {
 			
 			// Removes potentialNeighbors that want to go out of the goal zone since it is
 			// an illegal move.
-			boolean fromInGoalZone = this.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
-			boolean toOutOfGoalZone = this.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
+			boolean fromInGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
+			boolean toOutOfGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
 			if (fromInGoalZone && toOutOfGoalZone) {
 				listOfNeighbors.remove(i);
 				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
@@ -98,7 +98,7 @@ public class BoardState {
 			ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
 			
 			// Gets the value of the current configuration.
-			this.valueOfState = this.getHeuristicValueCurrentState(currentTokensConfiguration);
+			this.valueOfState = this.playerBackPointer.getHeuristicValueCurrentState(currentTokensConfiguration);
 			
 			System.out.println("The final value of this configuration is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.
@@ -115,82 +115,5 @@ public class BoardState {
 	
 	public LinkedList<CCMove> getListOfMoves() {
 		return (this.listOfPreviousMoves);
-	}
-	
-	private double getHeuristicValueCurrentState(ArrayList<Point> currentStateTokens) {
-		double heuristicValueBeforeMove = 0;
-		for (Point aToken : currentStateTokens) {
-			heuristicValueBeforeMove += this.getHeuristicValueForToken(aToken);
-		}
-		return (heuristicValueBeforeMove);
-	}
-	
-	/**
-	 * Will return the heuristic value for the current move.
-	 * 
-	 * @param currentMove The move to evaluate.
-	 * @return The value of the heuristic for the current move.
-	 */
-	private double getHeuristicValueForToken(Point position) {
-		// The heuristic that I am using is the Manhattan distance between the 
-		// current piece and the closest cell in the goal zone.
-		
-		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
-		double smallestDistance = 100;
-		
-		int opponentID = this.getOpponentID();
-		if (this.isTokenInBaseOfPlayer(position, opponentID)) {
-			// Returns 0 since the token is already in the opponent's base.
-			smallestDistance = 0;
-		} else {
-			Point[] borderCellsInGoalZone = this.playerBackPointer.getBorderCellsInGoalZone();
-			// Returns the shortest distance between the token and the border of the opponent's base.
-			for (int i = 0 ; i < borderCellsInGoalZone.length ; i++) {
-				Point boarderPoint = borderCellsInGoalZone[i];
-				
-				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
-				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
-				
-				double heuristicValue = Math.floor(Math.sqrt(x+y));
-				
-				if (heuristicValue < smallestDistance) {
-					smallestDistance = heuristicValue;
-				}
-			}
-		}
-		
-		System.out.println("\t The heursitic value is " + smallestDistance);
-		return (smallestDistance);
-	}
-	
-	/**
-	 * 
-	 * @return The oponent's number.
-	 */
-	private int getOpponentID() {
-		switch(this.playerBackPointer.getColor()) {
-			case 0:
-				return (3);
-			case 1:
-				return (2);
-			case 2:
-				return (1);
-			case 3:
-				return (0);
-			default:
-				System.err.println("Returned the opponent number to be equal to 0 since it was not matching any of the possible cases.");
-				return (0);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param positionOfToken The Point where the token is placed on the chessboard.
-	 * @param playerID The player's ID of the opponent.
-	 * @return True if the given token is in the opponen'ts base and false otherwise.
-	 */
-	private boolean isTokenInBaseOfPlayer(Point positionOfToken, int playerID){
-		Integer IDInteger= new Integer(playerID);
-		return (IDInteger.equals(this.currentState.board.get(positionOfToken)));
 	}
 }
