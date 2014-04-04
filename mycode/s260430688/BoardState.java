@@ -23,11 +23,12 @@ public class BoardState {
 	public double valueOfState;
 	s260430688Player playerBackPointer;
 
-	BoardState(s260430688Player playerBackPointer, CCBoard currentBoardConfiguration, Point tokenToConsider, LinkedList<CCMove> listOfPreviousMoves) {
+	BoardState(s260430688Player playerBackPointer, CCBoard currentBoardConfiguration, Point tokenToConsider, LinkedList<CCMove> listOfPreviousMoves, double valueOfState) {
 		this.currentState = currentBoardConfiguration;
 		this.tokenToConsider = tokenToConsider;
 		this.listOfPreviousMoves = listOfPreviousMoves;
 		this.playerBackPointer = playerBackPointer;
+		this.valueOfState = valueOfState;
 	}
 	
 	public void exploitState() {
@@ -73,13 +74,16 @@ public class BoardState {
 				CCBoard copyOfBoard = (CCBoard) this.currentState.clone();
 				// Executes the move on the copy of the board.
 				copyOfBoard.move(moveToExecute);
+				
+				double valueOfNewState = this.valueOfState - this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getFrom()) + this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getTo());
+				
 				// Creates a new list of past move.
 				@SuppressWarnings("unchecked")
 				LinkedList<CCMove> newListOfPreviousMoves = (LinkedList<CCMove>) this.listOfPreviousMoves.clone();
 				newListOfPreviousMoves.add(moveToExecute);
 				// Creates a new instance of the board state so that we potentially can exploid
 				// more hops.
-				BoardState newBoardState = new BoardState(this.playerBackPointer, copyOfBoard, moveToExecute.getTo(), newListOfPreviousMoves);
+				BoardState newBoardState = new BoardState(this.playerBackPointer, copyOfBoard, moveToExecute.getTo(), newListOfPreviousMoves, valueOfNewState);
 				newBoardState.exploitState();
 			}
 		}
@@ -94,11 +98,11 @@ public class BoardState {
 				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
 			}
 			
-			// Evaluate the value of the current configuration.
-			ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
-			
-			// Gets the value of the current configuration.
-			this.valueOfState = this.playerBackPointer.getHeuristicValueCurrentState(currentTokensConfiguration);
+//			// Evaluate the value of the current configuration.
+//			ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
+//			
+//			// Gets the value of the current configuration.
+//			this.valueOfState = this.playerBackPointer.getHeuristicValueCurrentState(currentTokensConfiguration);
 			
 			System.out.println("The final value of this configuration is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.

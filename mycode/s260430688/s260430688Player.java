@@ -139,7 +139,8 @@ public class s260430688Player extends Player {
 			System.out.println("Will start to analyze moves.");
 			
 			for (Point currentPoint : allMyTokens) {
-				BoardState boardConfiguration = new BoardState(this, (CCBoard) board.clone(), currentPoint, new LinkedList<CCMove>());
+				double valueOfState = this.getHeuristicValueCurrentState(allMyTokens);
+				BoardState boardConfiguration = new BoardState(this, (CCBoard) board.clone(), currentPoint, new LinkedList<CCMove>(), valueOfState);
 				boardConfiguration.exploitState();
 			}
 			
