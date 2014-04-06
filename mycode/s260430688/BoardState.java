@@ -17,7 +17,8 @@ import java.util.LinkedList;
  *
  */
 public class BoardState {
-	private final int MOVE_PENALTY_IF_IN_BASE = 50;
+	private final int MOVE_PENALTY_IF_MOVING_FROM_BASE = 300;
+	private final int MOVE_PENALTY_IF_IN_BASE = 500;
 	
 	private CCBoard currentState;
 	private Point tokenToConsider;
@@ -79,20 +80,22 @@ public class BoardState {
 				
 				double valueOfNewState = this.valueOfState - this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getFrom()) + this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getTo());
 				
-				boolean isFromInMyBase;
+				boolean isMoveOriginInMyBase;
 				if (this.listOfPreviousMoves.isEmpty()) {
-					isFromInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor());
+					isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor());
 				} else {
-					isFromInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(this.listOfPreviousMoves.getFirst().getFrom(), this.playerBackPointer.getColor());
+					isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(this.listOfPreviousMoves.getFirst().getFrom(), this.playerBackPointer.getColor());
 				}
-				boolean isToInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor());
-				if (isFromInMyBase && !isToInMyBase) {
+				boolean isMoveDestinationInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor());
+				
+				// Makes sure that the tokens go out of the initial goal zone as soon as possible.
+				if (isMoveOriginInMyBase && !isMoveDestinationInMyBase) {
 					System.out.println("The point goes from " + moveToExecute.getFrom().toString() + " to " + moveToExecute.getTo().toString());
-					System.out.println("Is from in base: " + this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor()));
-					System.out.println("Is to in base: " + this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor()));
-					System.out.println("Added bonus since the token will go out of my base. Value of the heuristic before: " + valueOfNewState);
+					valueOfNewState -= MOVE_PENALTY_IF_MOVING_FROM_BASE;
+				}
+				// Handles the situation where a token is not near the boarder of the goal zone.
+				if (isMoveOriginInMyBase) {
 					valueOfNewState -= MOVE_PENALTY_IF_IN_BASE;
-					System.out.println("Value of the heuristic after: " + valueOfNewState);
 				}
 				
 				// Creates a new list of past move.

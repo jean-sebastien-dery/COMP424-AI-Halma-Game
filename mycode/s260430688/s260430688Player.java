@@ -269,7 +269,7 @@ public class s260430688Player extends Player {
 //		if (this.isTokenInBaseOfPlayer(position, this.goalPlayerID)) {
 //			// Returns 0 since the token is already in the opponent's base.
 //			System.out.println("The heuristic will be 0 because it is in the goal zone for point " + position.toString());
-////			smallestDistance = 0; FIXME: the heuristic will need to be 0.
+//			smallestDistance = 0; //FIXME: the heuristic will need to be 0.
 //		} else {
 			Point[] borderCellsInGoalZone = this.getBorderCellsInGoalZone();
 			// Returns the shortest distance between the token and the border of the opponent's base.
