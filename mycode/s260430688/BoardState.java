@@ -17,6 +17,8 @@ import java.util.LinkedList;
  *
  */
 public class BoardState {
+	private final int MOVE_PENALTY_IF_IN_BASE = 50;
+	
 	private CCBoard currentState;
 	private Point tokenToConsider;
 	private LinkedList<CCMove> listOfPreviousMoves;
@@ -48,14 +50,14 @@ public class BoardState {
 				}
 			}
 			
-			// Removes potentialNeighbors that want to go out of the goal zone since it is
-			// an illegal move.
-			boolean fromInGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
-			boolean toOutOfGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
-			if (fromInGoalZone && toOutOfGoalZone) {
-				listOfNeighbors.remove(i);
-				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
-			}
+//			// Removes potentialNeighbors that want to go out of the goal zone since it is
+//			// an illegal move.
+//			boolean fromInGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
+//			boolean toOutOfGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
+//			if (fromInGoalZone && toOutOfGoalZone) {
+//				listOfNeighbors.remove(i);
+//				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
+//			}
 		}
 		
 		if (listOfNeighbors.size() == 0) {
@@ -77,6 +79,22 @@ public class BoardState {
 				
 				double valueOfNewState = this.valueOfState - this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getFrom()) + this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getTo());
 				
+				boolean isFromInMyBase;
+				if (this.listOfPreviousMoves.isEmpty()) {
+					isFromInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor());
+				} else {
+					isFromInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(this.listOfPreviousMoves.getFirst().getFrom(), this.playerBackPointer.getColor());
+				}
+				boolean isToInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor());
+				if (isFromInMyBase && !isToInMyBase) {
+					System.out.println("The point goes from " + moveToExecute.getFrom().toString() + " to " + moveToExecute.getTo().toString());
+					System.out.println("Is from in base: " + this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor()));
+					System.out.println("Is to in base: " + this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor()));
+					System.out.println("Added bonus since the token will go out of my base. Value of the heuristic before: " + valueOfNewState);
+					valueOfNewState -= MOVE_PENALTY_IF_IN_BASE;
+					System.out.println("Value of the heuristic after: " + valueOfNewState);
+				}
+				
 				// Creates a new list of past move.
 				@SuppressWarnings("unchecked")
 				LinkedList<CCMove> newListOfPreviousMoves = (LinkedList<CCMove>) this.listOfPreviousMoves.clone();
@@ -97,13 +115,7 @@ public class BoardState {
 			if (this.listOfPreviousMoves.getLast().isHop()) {
 				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
 			}
-			
-//			// Evaluate the value of the current configuration.
-//			ArrayList<Point> currentTokensConfiguration = this.currentState.getPieces(this.playerBackPointer.getColor());
-//			
-//			// Gets the value of the current configuration.
-//			this.valueOfState = this.playerBackPointer.getHeuristicValueCurrentState(currentTokensConfiguration);
-			
+
 			System.out.println("The final value of this configuration is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.
 			this.playerBackPointer.updatePriorityQueue(this);
