@@ -38,6 +38,8 @@ public class s260430688Player extends Player {
 	private boolean isPlayerInitialized = false;
 	
 	private int goalPlayerID = 0;
+	
+	private Thread mainThreadReference;
 
 	/**
 	 * Constructor.
@@ -66,6 +68,8 @@ public class s260430688Player extends Player {
     private void initializePlayer() {
     	System.out.println("The current color of my player is " + this.getColor());
     	
+    	mainThreadReference = Thread.currentThread();
+    	
     	if (this.board == null) {
     		// No assumptions are made, handles the initialization if the board was not set properly
         	// before this method is called. The points for the heuristic will therefore not reflect
@@ -77,35 +81,15 @@ public class s260430688Player extends Player {
     	
     	// Sets the point that will be used for to calculate the heuristic.
     	if (this.playerID == 0) { // Upper left
-//    		this.borderCellsInGoalZone[0] = new Point(15, 12);
-//    		this.borderCellsInGoalZone[1] = new Point(14, 12);
-//    		this.borderCellsInGoalZone[2] = new Point(13, 13);
-//    		this.borderCellsInGoalZone[3] = new Point(12, 14);
-//    		this.borderCellsInGoalZone[4] = new Point(12, 15);
     		this.borderCellsInGoalZone[0] = new Point(15, 15);
     		this.goalPlayerID = 3;
     	} else if (this.playerID == 1) { // Lower left
-//    		this.borderCellsInGoalZone[0] = new Point(0, 12);
-//    		this.borderCellsInGoalZone[1] = new Point(1, 12);
-//    		this.borderCellsInGoalZone[2] = new Point(2, 13);
-//    		this.borderCellsInGoalZone[3] = new Point(3, 14);
-//    		this.borderCellsInGoalZone[4] = new Point(3, 15);
     		this.borderCellsInGoalZone[0] = new Point(0, 15);
     		this.goalPlayerID = 2;
     	} else if (this.playerID == 2) { // Upper right
-//    		this.borderCellsInGoalZone[0] = new Point(12, 0);
-//    		this.borderCellsInGoalZone[1] = new Point(12, 1);
-//    		this.borderCellsInGoalZone[2] = new Point(13, 2);
-//    		this.borderCellsInGoalZone[3] = new Point(14, 3);
-//    		this.borderCellsInGoalZone[4] = new Point(15, 4);
     		this.borderCellsInGoalZone[0] = new Point(15, 0);
     		this.goalPlayerID = 1;
     	} else if (this.playerID == 3) { // Lower right
-//    		this.borderCellsInGoalZone[0] = new Point(3, 0);
-//    		this.borderCellsInGoalZone[1] = new Point(3, 1);
-//    		this.borderCellsInGoalZone[2] = new Point(2, 2);
-//    		this.borderCellsInGoalZone[3] = new Point(0, 3);
-//    		this.borderCellsInGoalZone[4] = new Point(1, 3);
     		this.borderCellsInGoalZone[0] = new Point(0, 0);
     		this.goalPlayerID = 0;
     	}
@@ -121,6 +105,7 @@ public class s260430688Player extends Player {
 		// Initializes the player based on the current board configuration.
 		if (!isPlayerInitialized) {
 			this.initializePlayer();
+			this.isPlayerInitialized = true;
 		}
 		
 		if (this.listOfMovesToReachBestState.isEmpty()) {
@@ -129,17 +114,20 @@ public class s260430688Player extends Player {
 			
 			this.updatePointsUsedByHeuristic();
 			
-			ArrayList<Point> allMyTokens = this.board.getPieces(this.playerID);
+			// TODO: so here I need to create a custom TimerTask that will enable me to complete the 
+			// execution after 1 second. I also wait the MoveAnalyzer thread to be able to terminate
+			// the timer if it has finished processing (instead of waiting for nothing).
 			
-			System.out.println("Will start to analyze moves.");
+			// Creates and start the thread that will process the current board and create the 
+			// priority list of desired states.
+			BoardStateProcessor boardStateProcessor = new BoardStateProcessor(this, this.board, mainThreadReference);
+			boardStateProcessor.start();
 			
-			for (Point currentPoint : allMyTokens) {
-				double valueOfState = this.getHeuristicValueCurrentState(allMyTokens);
-				BoardState boardConfiguration = new BoardState(this, (CCBoard) board.clone(), currentPoint, new LinkedList<CCMove>(), valueOfState);
-				boardConfiguration.exploitState();
+			try {
+				Thread.sleep(900);
+			} catch (InterruptedException e) {
+				System.out.println("The main thread has been waken up since the computation is over.");
 			}
-			
-			System.out.println("The priority queue is completed.");
 			
 			if (!this.priorityQueueOfBoardStates.isEmpty()) {
 				
