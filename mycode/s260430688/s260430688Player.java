@@ -29,7 +29,7 @@ public class s260430688Player extends Player {
 	/**
 	 * This reference point will be used to compute the heuristic of the value function.
 	 */
-	private Point[] borderCellsInGoalZone = new Point[1];
+	private ArrayList<Point> borderCellsInGoalZone = new ArrayList<Point>(10);
 
 	/**
 	 * Holds the priority queue that will be used to chose the desired state.
@@ -55,6 +55,8 @@ public class s260430688Player extends Player {
 	 * A reference to the main thread which is used by the BoardStateProcessor thread to wake it up when the computation is over.
 	 */
 	private Thread mainThreadReference;
+	
+	private boolean isHeuristicInAugmentingState = false;
 
 	/**
 	 * Constructor.
@@ -93,22 +95,22 @@ public class s260430688Player extends Player {
         	// before this method is called. The points for the heuristic will therefore not reflect
         	// the current configuration of the board.
     		System.err.println("The board was not properly set, cannot initialize the player.");
-    		this.borderCellsInGoalZone[0] = new Point(7, 7);
+    		this.borderCellsInGoalZone.add(new Point(7, 7));
     		return;
     	}
     	
     	// Sets the point that will be used for to calculate the heuristic.
     	if (this.playerID == 0) { // Upper left
-    		this.borderCellsInGoalZone[0] = new Point(15, 15);
+    		this.borderCellsInGoalZone.add(new Point(15, 15));
     		this.goalPlayerID = 3;
     	} else if (this.playerID == 1) { // Lower left
-    		this.borderCellsInGoalZone[0] = new Point(0, 15);
+    		this.borderCellsInGoalZone.add(new Point(0, 15));
     		this.goalPlayerID = 2;
     	} else if (this.playerID == 2) { // Upper right
-    		this.borderCellsInGoalZone[0] = new Point(15, 0);
+    		this.borderCellsInGoalZone.add(new Point(15, 0));
     		this.goalPlayerID = 1;
     	} else if (this.playerID == 3) { // Lower right
-    		this.borderCellsInGoalZone[0] = new Point(0, 0);
+    		this.borderCellsInGoalZone.add(new Point(0, 0));
     		this.goalPlayerID = 0;
     	}
     }
@@ -185,7 +187,7 @@ public class s260430688Player extends Player {
 //	    		this.borderCellsInGoalZone[2] = new Point(13, 13);
 //	    		this.borderCellsInGoalZone[3] = new Point(12, 14);
 //	    		this.borderCellsInGoalZone[4] = new Point(12, 15);
-	    		this.borderCellsInGoalZone[0] = new Point(15, 15);
+//	    		this.borderCellsInGoalZone[0] = new Point(15, 15);
 //	    		if (this.board.getPieceAt(new Point(15, 15)) != null && this.board.getPieceAt(new Point(15, 15)) == this.playerID) {
 //	    			if () {
 //	    				
@@ -197,21 +199,21 @@ public class s260430688Player extends Player {
 //	    		this.borderCellsInGoalZone[2] = new Point(2, 13);
 //	    		this.borderCellsInGoalZone[3] = new Point(3, 14);
 //	    		this.borderCellsInGoalZone[4] = new Point(3, 15);
-	    		this.borderCellsInGoalZone[0] = new Point(0, 15);
+//	    		this.borderCellsInGoalZone[0] = new Point(0, 15);
 	    	} else if (this.playerID == 2) { // Upper right
 //	    		this.borderCellsInGoalZone[0] = new Point(12, 0);
 //	    		this.borderCellsInGoalZone[1] = new Point(12, 1);
 //	    		this.borderCellsInGoalZone[2] = new Point(13, 2);
 //	    		this.borderCellsInGoalZone[3] = new Point(14, 3);
 //	    		this.borderCellsInGoalZone[4] = new Point(15, 4);
-	    		this.borderCellsInGoalZone[0] = new Point(15, 0);
+//	    		this.borderCellsInGoalZone[0] = new Point(15, 0);
 	    	} else if (this.playerID == 3) { // Lower right
 //	    		this.borderCellsInGoalZone[0] = new Point(3, 0);
 //	    		this.borderCellsInGoalZone[1] = new Point(3, 1);
 //	    		this.borderCellsInGoalZone[2] = new Point(2, 2);
 //	    		this.borderCellsInGoalZone[3] = new Point(0, 3);
 //	    		this.borderCellsInGoalZone[4] = new Point(1, 3);
-	    		this.borderCellsInGoalZone[0] = new Point(0, 0);
+//	    		this.borderCellsInGoalZone[0] = new Point(0, 0);
 	    	}
 		}
 	}
@@ -237,7 +239,7 @@ public class s260430688Player extends Player {
 	 * 
 	 * @return The cells that define the goal zone.
 	 */
-	public Point[] getBorderCellsInGoalZone() {
+	public ArrayList<Point> getBorderCellsInGoalZone() {
 		synchronized(this.borderCellsInGoalZone) {
 			return (this.borderCellsInGoalZone);
 		}
@@ -288,10 +290,10 @@ public class s260430688Player extends Player {
 //			System.out.println("The heuristic will be 0 because it is in the goal zone for point " + position.toString());
 //			smallestDistance = 0; //FIXME: the heuristic will need to be 0.
 //		} else {
-			Point[] borderCellsInGoalZone = this.getBorderCellsInGoalZone();
+			ArrayList<Point> borderCellsInGoalZone = this.getBorderCellsInGoalZone();
 			// Returns the shortest distance between the token and the border of the opponent's base.
-			for (int i = 0 ; i < borderCellsInGoalZone.length ; i++) {
-				Point boarderPoint = borderCellsInGoalZone[i];
+			for (int i = 0 ; i < borderCellsInGoalZone.size() ; i++) {
+				Point boarderPoint = borderCellsInGoalZone.get(i);
 				
 				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
 				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
