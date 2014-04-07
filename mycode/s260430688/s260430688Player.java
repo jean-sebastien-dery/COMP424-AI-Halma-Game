@@ -57,6 +57,8 @@ public class s260430688Player extends Player {
 	private Thread mainThreadReference;
 	
 	private boolean isHeuristicInAugmentingState = false;
+	
+	private int heuristicAugmentingState = 0;
 
 	/**
 	 * Constructor.
@@ -133,7 +135,7 @@ public class s260430688Player extends Player {
 			priorityQueueOfBoardStates.clear();
 			
 			// The reference points used by the heuristic are dynamics, so here I update them before starting the computation.
-			this.updatePointsUsedByHeuristic();
+//			this.updatePointsUsedByHeuristic();
 			
 			// Creates and start the thread that will process the current board and create the 
 			// priority list of desired states.
@@ -165,6 +167,8 @@ public class s260430688Player extends Player {
 				
 			} else {
 				// FIXME: not sure about this one, need to check boundary cases.
+				// TODO: if there are no moves, then a random move must be returned since I cannot
+				// return a NULL move if the game is not over yet.
 				// If the priority queue is empty, it means that all the tokens are at the goal zone.
 				System.out.println("All the tokens are in the goal zone so the game is over.");
 				return (new CCMove(this.playerID, null, null));
@@ -175,48 +179,82 @@ public class s260430688Player extends Player {
 		}
 	}
 	
-	/**
-	 * Updates the reference points used by the heuristic since it is dynamic depending the state of the board.
-	 */
-	private void updatePointsUsedByHeuristic() {
-		synchronized(this.borderCellsInGoalZone) {
-			// Sets the point that will be used for to calculate the heuristic.
-	    	if (this.playerID == 0) { // Upper left
-//	    		this.borderCellsInGoalZone[0] = new Point(15, 12);
-//	    		this.borderCellsInGoalZone[1] = new Point(14, 12);
-//	    		this.borderCellsInGoalZone[2] = new Point(13, 13);
-//	    		this.borderCellsInGoalZone[3] = new Point(12, 14);
-//	    		this.borderCellsInGoalZone[4] = new Point(12, 15);
-//	    		this.borderCellsInGoalZone[0] = new Point(15, 15);
-//	    		if (this.board.getPieceAt(new Point(15, 15)) != null && this.board.getPieceAt(new Point(15, 15)) == this.playerID) {
-//	    			if () {
-//	    				
-//	    			}
-//	    		}
-	    	} else if (this.playerID == 1) { // Lower left
-//	    		this.borderCellsInGoalZone[0] = new Point(0, 12);
-//	    		this.borderCellsInGoalZone[1] = new Point(1, 12);
-//	    		this.borderCellsInGoalZone[2] = new Point(2, 13);
-//	    		this.borderCellsInGoalZone[3] = new Point(3, 14);
-//	    		this.borderCellsInGoalZone[4] = new Point(3, 15);
-//	    		this.borderCellsInGoalZone[0] = new Point(0, 15);
-	    	} else if (this.playerID == 2) { // Upper right
-//	    		this.borderCellsInGoalZone[0] = new Point(12, 0);
-//	    		this.borderCellsInGoalZone[1] = new Point(12, 1);
-//	    		this.borderCellsInGoalZone[2] = new Point(13, 2);
-//	    		this.borderCellsInGoalZone[3] = new Point(14, 3);
-//	    		this.borderCellsInGoalZone[4] = new Point(15, 4);
-//	    		this.borderCellsInGoalZone[0] = new Point(15, 0);
-	    	} else if (this.playerID == 3) { // Lower right
-//	    		this.borderCellsInGoalZone[0] = new Point(3, 0);
-//	    		this.borderCellsInGoalZone[1] = new Point(3, 1);
-//	    		this.borderCellsInGoalZone[2] = new Point(2, 2);
-//	    		this.borderCellsInGoalZone[3] = new Point(0, 3);
-//	    		this.borderCellsInGoalZone[4] = new Point(1, 3);
-//	    		this.borderCellsInGoalZone[0] = new Point(0, 0);
-	    	}
+	public BoardState[] getBestTwoBoardState() {
+		synchronized(this.priorityQueueOfBoardStates) {
+			BoardState[] boardStates = new BoardState[2];
+			boardStates[0] = this.priorityQueueOfBoardStates.poll();
+ 			boardStates[1] = this.priorityQueueOfBoardStates.peek();
+ 			this.priorityQueueOfBoardStates.add(boardStates[0]);
+ 			return (boardStates);
 		}
 	}
+	
+//	private void augmentHeuristicForPlayer1() {
+//		// In this section I allocated new reference points for the heuristic.
+//		this.borderCellsInGoalZone = new ArrayList<Point>(10);
+//		switch(this.heuristicAugmentingState) {
+//			case 4:
+//				this.borderCellsInGoalZone.add(new Point(1, 12));
+//				this.borderCellsInGoalZone.add(new Point(2, 13));
+//				this.borderCellsInGoalZone.add(new Point(3, 14));
+//			case 3:
+//				this.borderCellsInGoalZone.add(new Point(0, 12));
+//				this.borderCellsInGoalZone.add(new Point(1, 13));
+//				this.borderCellsInGoalZone.add(new Point(2, 14));
+//				this.borderCellsInGoalZone.add(new Point(3, 15));
+//			case 2:
+//				this.borderCellsInGoalZone.add(new Point(0, 13));
+//				this.borderCellsInGoalZone.add(new Point(1, 14));
+//				this.borderCellsInGoalZone.add(new Point(2, 15));
+//			case 1:
+//				this.borderCellsInGoalZone.add(new Point(0, 14));
+//				this.borderCellsInGoalZone.add(new Point(1, 15));
+//		}
+//		this.heuristicAugmentingState++;
+//	}
+	
+//	/**
+//	 * Updates the reference points used by the heuristic since it is dynamic depending the state of the board.
+//	 */
+//	private void updatePointsUsedByHeuristic() {
+//		synchronized(this.borderCellsInGoalZone) {
+//			// Sets the point that will be used for to calculate the heuristic.
+//	    	if (this.playerID == 0) { // Upper left
+////	    		this.borderCellsInGoalZone[0] = new Point(15, 12);
+////	    		this.borderCellsInGoalZone[1] = new Point(14, 12);
+////	    		this.borderCellsInGoalZone[2] = new Point(13, 13);
+////	    		this.borderCellsInGoalZone[3] = new Point(12, 14);
+////	    		this.borderCellsInGoalZone[4] = new Point(12, 15);
+////	    		this.borderCellsInGoalZone[0] = new Point(15, 15);
+//	    	} else if (this.playerID == 1) { // Lower left
+//    			// In this section I remove filled reference points.
+//    			for (int i = 0 ; i < this.borderCellsInGoalZone.size() ; i++) {
+//    				Point currentPoint = this.borderCellsInGoalZone.get(i);
+//    				if (this.board.getPieceAt(currentPoint) != null && this.board.getPieceAt(currentPoint) == this.playerID) {
+//    					this.borderCellsInGoalZone.remove(i);
+//    				}
+//    			}
+//    			
+//    			if (this.borderCellsInGoalZone.isEmpty()) {
+//    				this.augmentHeuristicForPlayer1();
+//    			}
+//	    	} else if (this.playerID == 2) { // Upper right
+////	    		this.borderCellsInGoalZone[0] = new Point(12, 0);
+////	    		this.borderCellsInGoalZone[1] = new Point(12, 1);
+////	    		this.borderCellsInGoalZone[2] = new Point(13, 2);
+////	    		this.borderCellsInGoalZone[3] = new Point(14, 3);
+////	    		this.borderCellsInGoalZone[4] = new Point(15, 4);
+////	    		this.borderCellsInGoalZone[0] = new Point(15, 0);
+//	    	} else if (this.playerID == 3) { // Lower right
+////	    		this.borderCellsInGoalZone[0] = new Point(3, 0);
+////	    		this.borderCellsInGoalZone[1] = new Point(3, 1);
+////	    		this.borderCellsInGoalZone[2] = new Point(2, 2);
+////	    		this.borderCellsInGoalZone[3] = new Point(0, 3);
+////	    		this.borderCellsInGoalZone[4] = new Point(1, 3);
+////	    		this.borderCellsInGoalZone[0] = new Point(0, 0);
+//	    	}
+//		}
+//	}
 	
 	/**
 	 * 

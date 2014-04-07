@@ -118,6 +118,9 @@ public class BoardState {
 			if (this.listOfPreviousMoves.getLast().isHop()) {
 				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
 			}
+			
+			// This null will trigger the end of the set of states to execute.
+//			listOfPreviousMoves.add(null);
 
 			System.out.println("The final value of this configuration is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.

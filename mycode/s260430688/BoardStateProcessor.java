@@ -34,11 +34,18 @@ public class BoardStateProcessor extends Thread {
 		
 		System.out.println("Will start to analyze moves.");
 		
+		// Process the board once.
 		for (Point currentPoint : allMyTokens) {
 			double valueOfState = this.playerBackPointer.getHeuristicValueCurrentState(allMyTokens);
 			BoardState boardConfiguration = new BoardState(this.playerBackPointer, (CCBoard) board.clone(), currentPoint, new LinkedList<CCMove>(), valueOfState);
 			boardConfiguration.exploitState();
 		}
+		
+//		// Take the two best moves and process them
+//		BoardState[] twoBestBoardStates = this.playerBackPointer.getBestTwoBoardState();
+//		for (BoardState currentBoardState : twoBestBoardStates) {
+//			currentBoardState.exploitState();
+//		}
 		
 		this.mainThreadReference.interrupt();
 	}
