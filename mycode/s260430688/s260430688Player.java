@@ -31,14 +31,29 @@ public class s260430688Player extends Player {
 	 */
 	private Point[] borderCellsInGoalZone = new Point[1];
 
+	/**
+	 * Holds the priority queue that will be used to chose the desired state.
+	 */
 	private PriorityQueue<BoardState> priorityQueueOfBoardStates = new PriorityQueue<BoardState>(100, new BoardStateComparator());
 	
+	/**
+	 * Holds all the hops move when a desired state has been chosen.
+	 */
 	private LinkedList<CCMove> listOfMovesToReachBestState = new LinkedList<CCMove>();
 	
+	/**
+	 * Keeps track of whether or not the player has been initialized.
+	 */
 	private boolean isPlayerInitialized = false;
 	
+	/**
+	 * Holds the target goal's player ID.
+	 */
 	private int goalPlayerID = 0;
 	
+	/**
+	 * A reference to the main thread which is used by the BoardStateProcessor thread to wake it up when the computation is over.
+	 */
 	private Thread mainThreadReference;
 
 	/**
@@ -65,6 +80,9 @@ public class s260430688Player extends Player {
 	 */
     public Board createBoard() { return new CCBoard(); }
     
+    /**
+     * Initializes the player once the configuration of the board is known. This should only be executed once.
+     */
     private void initializePlayer() {
     	System.out.println("The current color of my player is " + this.getColor());
     	
@@ -112,17 +130,16 @@ public class s260430688Player extends Player {
 			// Clears the priority queue since it will be different for every move.
 			priorityQueueOfBoardStates.clear();
 			
+			// The reference points used by the heuristic are dynamics, so here I update them before starting the computation.
 			this.updatePointsUsedByHeuristic();
-			
-			// TODO: so here I need to create a custom TimerTask that will enable me to complete the 
-			// execution after 1 second. I also wait the MoveAnalyzer thread to be able to terminate
-			// the timer if it has finished processing (instead of waiting for nothing).
 			
 			// Creates and start the thread that will process the current board and create the 
 			// priority list of desired states.
 			BoardStateProcessor boardStateProcessor = new BoardStateProcessor(this, this.board, mainThreadReference);
 			boardStateProcessor.start();
 			
+			// This block of code will sleep the main thread until one second has elapsed, or will be
+			// waked up by the BoardStateProcessor thread.
 			try {
 				Thread.sleep(900);
 			} catch (InterruptedException e) {
@@ -145,6 +162,7 @@ public class s260430688Player extends Player {
 				return (listOfMovesToReachBestState.removeFirst());
 				
 			} else {
+				// FIXME: not sure about this one, need to check boundary cases.
 				// If the priority queue is empty, it means that all the tokens are at the goal zone.
 				System.out.println("All the tokens are in the goal zone so the game is over.");
 				return (new CCMove(this.playerID, null, null));
@@ -155,6 +173,9 @@ public class s260430688Player extends Player {
 		}
 	}
 	
+	/**
+	 * Updates the reference points used by the heuristic since it is dynamic depending the state of the board.
+	 */
 	private void updatePointsUsedByHeuristic() {
 		synchronized(this.borderCellsInGoalZone) {
 			// Sets the point that will be used for to calculate the heuristic.
@@ -233,6 +254,12 @@ public class s260430688Player extends Player {
 		}
 	}
 	
+	/**
+	 * Computes the heuristic value for the given state of the board.
+	 * 
+	 * @param currentStateTokens The position of all the player's token on the board.
+	 * @return The heuristic value of this state.
+	 */
 	public double getHeuristicValueCurrentState(ArrayList<Point> currentStateTokens) {
 		double heuristicValueBeforeMove = 0;
 		for (Point aToken : currentStateTokens) {
@@ -254,6 +281,8 @@ public class s260430688Player extends Player {
 		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
 		double smallestDistance = 100;
 		
+		// TODO: If the reference points used by the heuristic are dynamics then I don't need to set the 
+		// heuristic value to 0 manually.
 //		if (this.isTokenInBaseOfPlayer(position, this.goalPlayerID)) {
 //			// Returns 0 since the token is already in the opponent's base.
 //			System.out.println("The heuristic will be 0 because it is in the goal zone for point " + position.toString());
