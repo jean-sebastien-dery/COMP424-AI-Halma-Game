@@ -114,8 +114,38 @@ public class BoardState {
 			
 			// So here the NULL move must only be added whenever the last move was a hop since this is how the server gets informed
 			// that the turn is now over. If the last move is not a hop, the NULL move must not be added.
-			if (this.listOfPreviousMoves.getLast().isHop()) {
-				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+			
+//			if (this.listOfPreviousMoves.getLast() != null && this.listOfPreviousMoves.getLast().isHop()) {
+//				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+//			} else if (this.listOfPreviousMoves.getLast() == null) {
+//				if (this.listOfPreviousMoves.get(this.listOfPreviousMoves.size()-2).isHop()) {
+//					listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+//				}
+//			}
+
+			System.out.println("*****");
+			System.out.println("List of moves:");
+			for (CCMove aMove : this.listOfPreviousMoves) {
+				if (aMove != null) {
+					System.out.println(aMove.toPrettyString());
+				} else {
+					System.out.println("A NULL move.");
+				}
+			}
+			System.out.println("*****");
+			
+			for (int i = (this.listOfPreviousMoves.size()-1) ; i >= 0 ; i--) {
+				if (this.listOfPreviousMoves.get(i) != null && this.listOfPreviousMoves.get(i).isHop()) {
+					System.out.println("Adding a move with NULL 'to' and 'from' at " + i);
+					listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
+					break;
+				} else {
+					if (this.listOfPreviousMoves.get(i) == null) {
+						System.out.println("The NULL move has been encountered at i="+i);
+					} else {
+						System.out.println("This move was encountered: " + this.listOfPreviousMoves.get(i).toPrettyString() + " at i=" + i);
+					}
+				}
 			}
 			
 			// This null move will trigger the end of the set of states to execute.
