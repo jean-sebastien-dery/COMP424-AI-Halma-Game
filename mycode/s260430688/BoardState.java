@@ -44,7 +44,7 @@ public class BoardState {
 			
 			// Removes cycle by verifying if the potential next state was already visited.
 			for (CCMove previousMove : listOfPreviousMoves) {
-				if (potentialNeighbour.getTo().equals(previousMove.getFrom())) {
+				if (previousMove != null && potentialNeighbour.getTo().equals(previousMove.getFrom())) {
 					System.out.println("A cycle was detected, removing it from the list potential neighbors.");
 					listOfNeighbors.remove(i);
 					--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
@@ -65,7 +65,7 @@ public class BoardState {
 			// If the size of neighbors is empty, it means that there are no valid moves,
 			// therefore we can evaluate the value of the list of moves.
 			
-			System.out.println("The list of neighbors is equal to 0.");
+			System.out.println("The list of neighbors is equal to 0, a leaf of the tree has been reached. Adding the current state to the priority queue.");
 			
 			this.addCurrentStateToPriorityQueue();
 		} else {
@@ -90,7 +90,6 @@ public class BoardState {
 				
 				// Makes sure that the tokens go out of the initial goal zone as soon as possible.
 				if (isMoveOriginInMyBase && !isMoveDestinationInMyBase) {
-					System.out.println("The point goes from " + moveToExecute.getFrom().toString() + " to " + moveToExecute.getTo().toString());
 					valueOfNewState -= MOVE_PENALTY_IF_MOVING_FROM_BASE;
 				}
 				// Handles the situation where a token is not near the boarder of the goal zone.
@@ -119,19 +118,12 @@ public class BoardState {
 				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
 			}
 			
-			// This null will trigger the end of the set of states to execute.
-//			listOfPreviousMoves.add(null);
+			// This null move will trigger the end of the set of states to execute.
+			listOfPreviousMoves.add(null);
 
-			System.out.println("The final value of this configuration is " + this.valueOfState);
+			System.out.println("The final value of this leaf state is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.
 			this.playerBackPointer.updatePriorityQueue(this);
-
-			System.out.println("List of moves in order to reach this state:");
-			for (CCMove aMove : this.listOfPreviousMoves) {
-				System.out.println(aMove.toPrettyString());
-			}
-		} else {
-			System.out.println("Detected that no moves were made to reach this state so it will be ignored.");
 		}
 	}
 	
