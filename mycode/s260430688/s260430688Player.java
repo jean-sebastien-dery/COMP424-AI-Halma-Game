@@ -131,6 +131,17 @@ public class s260430688Player extends Player {
 			this.isPlayerInitialized = true;
 		}
 		
+		// Check if all the player's token are in the goal base.
+		boolean win=true;
+		Integer IDInteger= new Integer(playerID);
+		for(Point p: this.board.bases[goalPlayerID]){
+			win &= IDInteger.equals(this.board.board.get(p));
+		}
+		if (win) {
+			System.out.println("Player " + playerID + " has won the game!");
+			return (new CCMove(playerID, null, null));
+		}
+		
 		if (!this.listOfMovesToReachBestState.isEmpty() && this.listOfMovesToReachBestState.getFirst() == null) {
 			
 			System.out.println("List of moves:");
@@ -144,9 +155,6 @@ public class s260430688Player extends Player {
 			
 			// Clears the priority queue since it will be different for every move.
 			priorityQueueOfBoardStates.clear();
-			
-			// The reference points used by the heuristic are dynamics, so here I update them before starting the computation.
-//			this.updatePointsUsedByHeuristic();
 			
 			// Creates and start the thread that will process the current board and create the 
 			// priority list of desired states.
@@ -213,73 +221,6 @@ public class s260430688Player extends Player {
 		}
 	}
 	
-//	private void augmentHeuristicForPlayer1() {
-//		// In this section I allocated new reference points for the heuristic.
-//		this.borderCellsInGoalZone = new ArrayList<Point>(10);
-//		switch(this.heuristicAugmentingState) {
-//			case 4:
-//				this.borderCellsInGoalZone.add(new Point(1, 12));
-//				this.borderCellsInGoalZone.add(new Point(2, 13));
-//				this.borderCellsInGoalZone.add(new Point(3, 14));
-//			case 3:
-//				this.borderCellsInGoalZone.add(new Point(0, 12));
-//				this.borderCellsInGoalZone.add(new Point(1, 13));
-//				this.borderCellsInGoalZone.add(new Point(2, 14));
-//				this.borderCellsInGoalZone.add(new Point(3, 15));
-//			case 2:
-//				this.borderCellsInGoalZone.add(new Point(0, 13));
-//				this.borderCellsInGoalZone.add(new Point(1, 14));
-//				this.borderCellsInGoalZone.add(new Point(2, 15));
-//			case 1:
-//				this.borderCellsInGoalZone.add(new Point(0, 14));
-//				this.borderCellsInGoalZone.add(new Point(1, 15));
-//		}
-//		this.heuristicAugmentingState++;
-//	}
-	
-//	/**
-//	 * Updates the reference points used by the heuristic since it is dynamic depending the state of the board.
-//	 */
-//	private void updatePointsUsedByHeuristic() {
-//		synchronized(this.borderCellsInGoalZone) {
-//			// Sets the point that will be used for to calculate the heuristic.
-//	    	if (this.playerID == 0) { // Upper left
-////	    		this.borderCellsInGoalZone[0] = new Point(15, 12);
-////	    		this.borderCellsInGoalZone[1] = new Point(14, 12);
-////	    		this.borderCellsInGoalZone[2] = new Point(13, 13);
-////	    		this.borderCellsInGoalZone[3] = new Point(12, 14);
-////	    		this.borderCellsInGoalZone[4] = new Point(12, 15);
-////	    		this.borderCellsInGoalZone[0] = new Point(15, 15);
-//	    	} else if (this.playerID == 1) { // Lower left
-//    			// In this section I remove filled reference points.
-//    			for (int i = 0 ; i < this.borderCellsInGoalZone.size() ; i++) {
-//    				Point currentPoint = this.borderCellsInGoalZone.get(i);
-//    				if (this.board.getPieceAt(currentPoint) != null && this.board.getPieceAt(currentPoint) == this.playerID) {
-//    					this.borderCellsInGoalZone.remove(i);
-//    				}
-//    			}
-//    			
-//    			if (this.borderCellsInGoalZone.isEmpty()) {
-//    				this.augmentHeuristicForPlayer1();
-//    			}
-//	    	} else if (this.playerID == 2) { // Upper right
-////	    		this.borderCellsInGoalZone[0] = new Point(12, 0);
-////	    		this.borderCellsInGoalZone[1] = new Point(12, 1);
-////	    		this.borderCellsInGoalZone[2] = new Point(13, 2);
-////	    		this.borderCellsInGoalZone[3] = new Point(14, 3);
-////	    		this.borderCellsInGoalZone[4] = new Point(15, 4);
-////	    		this.borderCellsInGoalZone[0] = new Point(15, 0);
-//	    	} else if (this.playerID == 3) { // Lower right
-////	    		this.borderCellsInGoalZone[0] = new Point(3, 0);
-////	    		this.borderCellsInGoalZone[1] = new Point(3, 1);
-////	    		this.borderCellsInGoalZone[2] = new Point(2, 2);
-////	    		this.borderCellsInGoalZone[3] = new Point(0, 3);
-////	    		this.borderCellsInGoalZone[4] = new Point(1, 3);
-////	    		this.borderCellsInGoalZone[0] = new Point(0, 0);
-//	    	}
-//		}
-//	}
-	
 	/**
 	 * 
 	 * @param positionOfToken The Point where the token is placed on the chessboard.
@@ -345,30 +286,21 @@ public class s260430688Player extends Player {
 		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
 		double smallestDistance = 100;
 		
-		// TODO: If the reference points used by the heuristic are dynamics then I don't need to set the 
-		// heuristic value to 0 manually.
-//		if (this.isTokenInBaseOfPlayer(position, this.goalPlayerID)) {
-//			// Returns 0 since the token is already in the opponent's base.
-//			System.out.println("The heuristic will be 0 because it is in the goal zone for point " + position.toString());
-//			smallestDistance = 0; //FIXME: the heuristic will need to be 0.
-//		} else {
-			ArrayList<Point> borderCellsInGoalZone = this.getBorderCellsInGoalZone();
-			// Returns the shortest distance between the token and the border of the opponent's base.
-			for (int i = 0 ; i < borderCellsInGoalZone.size() ; i++) {
-				Point boarderPoint = borderCellsInGoalZone.get(i);
-				
-				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
-				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
-				
-				double heuristicValue = Math.floor(Math.sqrt(x+y));
-				
-				if (heuristicValue < smallestDistance) {
-					smallestDistance = heuristicValue;
-				}
+		ArrayList<Point> borderCellsInGoalZone = this.getBorderCellsInGoalZone();
+		// Returns the shortest distance between the token and the border of the opponent's base.
+		for (int i = 0 ; i < borderCellsInGoalZone.size() ; i++) {
+			Point boarderPoint = borderCellsInGoalZone.get(i);
+			
+			double x = Math.pow((double)(boarderPoint.x-position.x), 2);
+			double y = Math.pow((double)(boarderPoint.y-position.y), 2);
+			
+			double heuristicValue = Math.floor(Math.sqrt(x+y));
+			
+			if (heuristicValue < smallestDistance) {
+				smallestDistance = heuristicValue;
 			}
-//		}
+		}
 		
-//		System.out.println("\t The heursitic value is " + smallestDistance + " for token at " + position.toString());
 		return (smallestDistance);
 	}
 }
