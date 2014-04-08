@@ -50,15 +50,6 @@ public class BoardState {
 					--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
 				}
 			}
-			
-//			// Removes potentialNeighbors that want to go out of the goal zone since it is
-//			// an illegal move.
-//			boolean fromInGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getFrom(), this.playerBackPointer.getColor());
-//			boolean toOutOfGoalZone = this.playerBackPointer.isTokenInBaseOfPlayer(potentialNeighbour.getTo(), this.playerBackPointer.getColor());
-//			if (fromInGoalZone && toOutOfGoalZone) {
-//				listOfNeighbors.remove(i);
-//				--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
-//			}
 		}
 		
 		if (listOfNeighbors.size() == 0) {
@@ -112,28 +103,8 @@ public class BoardState {
 	private void addCurrentStateToPriorityQueue() {
 		if (!this.listOfPreviousMoves.isEmpty()) {
 			
-			// So here the NULL move must only be added whenever the last move was a hop since this is how the server gets informed
-			// that the turn is now over. If the last move is not a hop, the NULL move must not be added.
-			
-//			if (this.listOfPreviousMoves.getLast() != null && this.listOfPreviousMoves.getLast().isHop()) {
-//				listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
-//			} else if (this.listOfPreviousMoves.getLast() == null) {
-//				if (this.listOfPreviousMoves.get(this.listOfPreviousMoves.size()-2).isHop()) {
-//					listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
-//				}
-//			}
-
-			System.out.println("*****");
-			System.out.println("List of moves:");
-			for (CCMove aMove : this.listOfPreviousMoves) {
-				if (aMove != null) {
-					System.out.println(aMove.toPrettyString());
-				} else {
-					System.out.println("A NULL move.");
-				}
-			}
-			System.out.println("*****");
-			
+			// So here the move with null 'to' and 'from' must only be added whenever the last move was a hop since this is how the server gets informed
+			// that the turn is now over. If the last move is not a hop, the move with null 'to' and 'from' must not be added.
 			for (int i = (this.listOfPreviousMoves.size()-1) ; i >= 0 ; i--) {
 				if (this.listOfPreviousMoves.get(i) != null && this.listOfPreviousMoves.get(i).isHop()) {
 					System.out.println("Adding a move with NULL 'to' and 'from' at " + i);

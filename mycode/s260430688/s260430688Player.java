@@ -55,10 +55,6 @@ public class s260430688Player extends Player {
 	 * A reference to the main thread which is used by the BoardStateProcessor thread to wake it up when the computation is over.
 	 */
 	private Thread mainThreadReference;
-	
-	private boolean isHeuristicInAugmentingState = false;
-	
-	private int heuristicAugmentingState = 0;
 
 	/**
 	 * Constructor.
@@ -118,6 +114,7 @@ public class s260430688Player extends Player {
     	}
     }
 
+	@SuppressWarnings("static-access")
 	@Override
 	public Move chooseMove(Board board) {
 		System.out.println("Need to chose a move.");

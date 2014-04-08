@@ -39,12 +39,6 @@ public class BoardStateProcessor extends Thread {
 			boardConfiguration.exploitState();
 		}
 		
-		System.out.println("**********");
-		System.out.println("The first level of the tree has been explored.");
-		System.out.println("**********");
-		
-		// TODO: add the case wher the currentBoardState is equal to NULL.
-		
 		// Take the two best moves and process them.
 		BoardState[] twoBestBoardStates = this.playerBackPointer.getBestTwoBoardState();
 		for (BoardState currentBoardState : twoBestBoardStates) {
@@ -52,11 +46,6 @@ public class BoardStateProcessor extends Thread {
 				currentBoardState.exploitState();
 			}
 		}
-		
-		System.out.println("**********");
-		System.out.println("The second level of the tree has been explored.");
-		System.out.println("**********");
-		
 		
 		// Process them again in order to have a total of three moves in advance for the
 		// selected best moves.
@@ -66,6 +55,7 @@ public class BoardStateProcessor extends Thread {
 			}
 		}
 		
+		// Wakes up the main thread when the computation is over.
 		this.mainThreadReference.interrupt();
 	}
 }
