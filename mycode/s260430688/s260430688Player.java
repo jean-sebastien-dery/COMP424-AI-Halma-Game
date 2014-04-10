@@ -283,21 +283,25 @@ public class s260430688Player extends Player {
 		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
 		double smallestDistance = 100;
 		
-		ArrayList<Point> borderCellsInGoalZone = this.getBorderCellsInGoalZone();
-		// Returns the shortest distance between the token and the border of the opponent's base.
-		for (int i = 0 ; i < borderCellsInGoalZone.size() ; i++) {
-			Point boarderPoint = borderCellsInGoalZone.get(i);
-			
-			double x = Math.pow((double)(boarderPoint.x-position.x), 2);
-			double y = Math.pow((double)(boarderPoint.y-position.y), 2);
-			
-			double heuristicValue = Math.floor(Math.sqrt(x+y));
-			
-			if (heuristicValue < smallestDistance) {
-				smallestDistance = heuristicValue;
+		if (this.isTokenInBaseOfPlayer(position, goalPlayerID)) {
+			return (0);
+		} else {
+			ArrayList<Point> borderCellsInGoalZone = this.getBorderCellsInGoalZone();
+			// Returns the shortest distance between the token and the border of the opponent's base.
+			for (int i = 0 ; i < borderCellsInGoalZone.size() ; i++) {
+				Point boarderPoint = borderCellsInGoalZone.get(i);
+				
+				double x = Math.pow((double)(boarderPoint.x-position.x), 2);
+				double y = Math.pow((double)(boarderPoint.y-position.y), 2);
+				
+				double heuristicValue = Math.floor(Math.sqrt(x+y));
+				
+				if (heuristicValue < smallestDistance) {
+					smallestDistance = heuristicValue;
+				}
 			}
+			
+			return (smallestDistance);
 		}
-		
-		return (smallestDistance);
 	}
 }
