@@ -84,7 +84,7 @@ public class s260430688Player extends Player {
      * Initializes the player once the configuration of the board is known. This should only be executed once.
      */
     private void initializePlayer() {
-    	System.out.println("The current color of my player is " + this.getColor());
+//    	System.out.println("The current color of my player is " + this.getColor());
     	
     	mainThreadReference = Thread.currentThread();
     	listOfMovesToReachBestState.add(null);
@@ -93,7 +93,7 @@ public class s260430688Player extends Player {
     		// No assumptions are made, handles the initialization if the board was not set properly
         	// before this method is called. The points for the heuristic will therefore not reflect
         	// the current configuration of the board.
-    		System.err.println("The board was not properly set, cannot initialize the player.");
+//    		System.err.println("The board was not properly set, cannot initialize the player.");
     		this.borderCellsInGoalZone.add(new Point(7, 7));
     		return;
     	}
@@ -135,20 +135,20 @@ public class s260430688Player extends Player {
 			win &= IDInteger.equals(this.board.board.get(p));
 		}
 		if (win) {
-			System.out.println("Player " + playerID + " has won the game!");
+//			System.out.println("Player " + playerID + " has won the game!");
 			return (new CCMove(playerID, null, null));
 		}
 		
 		if (!this.listOfMovesToReachBestState.isEmpty() && this.listOfMovesToReachBestState.getFirst() == null) {
 			
-			System.out.println("List of moves:");
-			for (CCMove aMove : this.listOfMovesToReachBestState) {
-				if (aMove != null) {
-					System.out.println("Move: " + aMove.toPrettyString());
-				} else {
-					System.out.println("NULL move.");
-				}
-			}
+//			System.out.println("List of moves:");
+//			for (CCMove aMove : this.listOfMovesToReachBestState) {
+//				if (aMove != null) {
+//					System.out.println("Move: " + aMove.toPrettyString());
+//				} else {
+//					System.out.println("NULL move.");
+//				}
+//			}
 			
 			// Clears the priority queue since it will be different for every move.
 			priorityQueueOfBoardStates.clear();
@@ -163,7 +163,7 @@ public class s260430688Player extends Player {
 			try {
 				Thread.sleep(900);
 			} catch (InterruptedException e) {
-				System.out.println("The main thread has been waken up since the computation is over.");
+//				System.out.println("The main thread has been waken up since the computation is over.");
 			}
 			
 			if (!this.priorityQueueOfBoardStates.isEmpty()) {
@@ -177,12 +177,12 @@ public class s260430688Player extends Player {
 					// Pops the best desired state in the priority queue.
 					BoardState bestBoardState = this.priorityQueueOfBoardStates.poll();
 					listOfMovesToReachBestState = bestBoardState.getListOfMoves();
-					System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
-					for (CCMove aMove : this.listOfMovesToReachBestState) {
-						if (aMove != null) {
-							System.out.println(aMove.toPrettyString());
-						}
-					}
+//					System.out.println("There are "+this.listOfMovesToReachBestState.size()+" move(s) in order to reach the best state and its heuristic value is "+bestBoardState.valueOfState+", here's the list: ");
+//					for (CCMove aMove : this.listOfMovesToReachBestState) {
+//						if (aMove != null) {
+//							System.out.println(aMove.toPrettyString());
+//						}
+//					}
 				} while(listOfMovesToReachBestState.isEmpty());
 				
 				return (listOfMovesToReachBestState.removeFirst());
@@ -192,7 +192,7 @@ public class s260430688Player extends Player {
 				// TODO: if there are no moves, then a random move must be returned since I cannot
 				// return a NULL move if the game is not over yet.
 				// If the priority queue is empty, it means that all the tokens are at the goal zone.
-				System.out.println("All the tokens are in the goal zone so the game is over.");
+//				System.out.println("All the tokens are in the goal zone so the game is over.");
 				return (new CCMove(this.playerID, null, null));
 			}
 		} else {
