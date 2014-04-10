@@ -161,7 +161,7 @@ public class s260430688Player extends Player {
 			// This block of code will sleep the main thread until one second has elapsed, or will be
 			// waked up by the BoardStateProcessor thread.
 			try {
-				Thread.sleep(900);
+				Thread.sleep(850);
 			} catch (InterruptedException e) {
 //				System.out.println("The main thread has been waken up since the computation is over.");
 			}
