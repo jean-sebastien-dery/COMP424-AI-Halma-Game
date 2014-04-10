@@ -61,6 +61,12 @@ public class BoardStateProcessor extends Thread {
 			}
 		}
 		
+		for (BoardState currentBoardState : twoBestBoardStates) {
+			if (currentBoardState != null) {
+				currentBoardState.exploitState();
+			}
+		}
+		
 		// Wakes up the main thread when the computation is over.
 		this.mainThreadReference.interrupt();
 	}

@@ -204,15 +204,19 @@ public class s260430688Player extends Player {
 	
 	public BoardState[] getBestTwoBoardState() {
 		synchronized(this.priorityQueueOfBoardStates) {
-			BoardState[] boardStates = new BoardState[3];
+			BoardState[] boardStates = new BoardState[4];
 			boardStates[0] = this.priorityQueueOfBoardStates.poll();
 			boardStates[1] = this.priorityQueueOfBoardStates.poll();
- 			boardStates[2] = this.priorityQueueOfBoardStates.peek();
+			boardStates[2] = this.priorityQueueOfBoardStates.poll();
+ 			boardStates[3] = this.priorityQueueOfBoardStates.peek();
  			if (boardStates[0] != null) {
  				this.priorityQueueOfBoardStates.add(boardStates[0]);
  			}
  			if (boardStates[1] != null) {
  				this.priorityQueueOfBoardStates.add(boardStates[1]);
+ 			}
+ 			if (boardStates[2] != null) {
+ 				this.priorityQueueOfBoardStates.add(boardStates[2]);
  			}
  			return (boardStates);
 		}
