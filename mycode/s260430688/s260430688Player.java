@@ -188,8 +188,6 @@ public class s260430688Player extends Player {
 				return (listOfMovesToReachBestState.removeFirst());
 				
 			} else {
-				// FIXME: not sure about this one, need to check boundary cases.
-				// TODO: if there are no moves, then a random move must be returned since I cannot
 				// return a NULL move if the game is not over yet.
 				// If the priority queue is empty, it means that all the tokens are at the goal zone.
 //				System.out.println("All the tokens are in the goal zone so the game is over.");
@@ -197,7 +195,7 @@ public class s260430688Player extends Player {
 			}
 		} else {
 			// If we are here it means that we have not reached the desired state yet.
-			System.out.println("Returning a move that is in the list of moves to reach the desired state.");
+//			System.out.println("Returning a move that is in the list of moves to reach the desired state.");
 			return (listOfMovesToReachBestState.removeFirst());
 		}
 	}
