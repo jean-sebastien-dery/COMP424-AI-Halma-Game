@@ -40,32 +40,34 @@ public class BoardStateProcessor extends Thread {
 		}
 		
 		// Take the two best moves and process them.
-		BoardState[] twoBestBoardStates = this.playerBackPointer.getBestTwoBoardState();
-		for (BoardState currentBoardState : twoBestBoardStates) {
-			if (currentBoardState != null) {
-				currentBoardState.exploitState();
+		for (int i = 0 ; i < 6 ; i++) {
+			BoardState[] twoBestBoardStates = this.playerBackPointer.getBestTwoBoardState();
+			for (BoardState currentBoardState : twoBestBoardStates) {
+				if (currentBoardState != null) {
+					currentBoardState.exploitState();
+				}
 			}
 		}
 		
-		// Process them again in order to have a total of three moves in advance for the
-		// selected best moves.
-		for (BoardState currentBoardState : twoBestBoardStates) {
-			if (currentBoardState != null) {
-				currentBoardState.exploitState();
-			}
-		}
-		
-		for (BoardState currentBoardState : twoBestBoardStates) {
-			if (currentBoardState != null) {
-				currentBoardState.exploitState();
-			}
-		}
-		
-		for (BoardState currentBoardState : twoBestBoardStates) {
-			if (currentBoardState != null) {
-				currentBoardState.exploitState();
-			}
-		}
+//		// Process them again in order to have a total of three moves in advance for the
+//		// selected best moves.
+//		for (BoardState currentBoardState : twoBestBoardStates) {
+//			if (currentBoardState != null) {
+//				currentBoardState.exploitState();
+//			}
+//		}
+//		
+//		for (BoardState currentBoardState : twoBestBoardStates) {
+//			if (currentBoardState != null) {
+//				currentBoardState.exploitState();
+//			}
+//		}
+//		
+//		for (BoardState currentBoardState : twoBestBoardStates) {
+//			if (currentBoardState != null) {
+//				currentBoardState.exploitState();
+//			}
+//		}
 		
 		// Wakes up the main thread when the computation is over.
 		this.mainThreadReference.interrupt();
