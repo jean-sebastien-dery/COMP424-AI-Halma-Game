@@ -69,8 +69,10 @@ public class BoardState {
 				// Executes the move on the copy of the board.
 				copyOfBoard.move(moveToExecute);
 				
+				// Updates the value of the heuristic.
 				double valueOfNewState = this.valueOfState - this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getFrom()) + this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getTo());
 				
+				// This section will add the penalty to the move if it is in the goal zone and/or goes out of it.
 				boolean isMoveOriginInMyBase;
 				if (this.listOfPreviousMoves.isEmpty()) {
 					isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor());

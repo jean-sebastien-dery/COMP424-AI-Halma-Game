@@ -200,7 +200,11 @@ public class s260430688Player extends Player {
 		}
 	}
 	
-	public BoardState[] getBestTwoBoardState() {
+	/**
+	 * 
+	 * @return The best moves that will be considered for further search.
+	 */
+	public BoardState[] getBestFourBoardState() {
 		synchronized(this.priorityQueueOfBoardStates) {
 			BoardState[] boardStates = new BoardState[4];
 			boardStates[0] = this.priorityQueueOfBoardStates.poll();
@@ -285,6 +289,7 @@ public class s260430688Player extends Player {
 		// Initializes the 'smallestDistance' variable to an impossible value given the size of the board.
 		double smallestDistance = 100;
 		
+		// The heuristic value will be equal to 0 if the token is in the goal zone.
 		if (this.isTokenInBaseOfPlayer(position, goalPlayerID)) {
 			return (0);
 		} else {

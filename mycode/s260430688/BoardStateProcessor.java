@@ -39,35 +39,15 @@ public class BoardStateProcessor extends Thread {
 			boardConfiguration.exploitState();
 		}
 		
-		// Take the two best moves and process them.
+		// Take the two best moves and process them for further iterations.
 		for (int i = 0 ; i < 6 ; i++) {
-			BoardState[] twoBestBoardStates = this.playerBackPointer.getBestTwoBoardState();
+			BoardState[] twoBestBoardStates = this.playerBackPointer.getBestFourBoardState();
 			for (BoardState currentBoardState : twoBestBoardStates) {
 				if (currentBoardState != null) {
 					currentBoardState.exploitState();
 				}
 			}
 		}
-		
-//		// Process them again in order to have a total of three moves in advance for the
-//		// selected best moves.
-//		for (BoardState currentBoardState : twoBestBoardStates) {
-//			if (currentBoardState != null) {
-//				currentBoardState.exploitState();
-//			}
-//		}
-//		
-//		for (BoardState currentBoardState : twoBestBoardStates) {
-//			if (currentBoardState != null) {
-//				currentBoardState.exploitState();
-//			}
-//		}
-//		
-//		for (BoardState currentBoardState : twoBestBoardStates) {
-//			if (currentBoardState != null) {
-//				currentBoardState.exploitState();
-//			}
-//		}
 		
 		// Wakes up the main thread when the computation is over.
 		this.mainThreadReference.interrupt();
