@@ -1,2 +1,0 @@
-1. I need to give a discount to tokens that go out of the initial goal zone so that they are all out before 100 turns.
-2. ne pas recalculer la valeur du heuristic a chaque fois, je peux le calculer une fois et juste updater la difference
