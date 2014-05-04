@@ -45,7 +45,6 @@ public class BoardState {
 			// Removes cycle by verifying if the potential next state was already visited.
 			for (CCMove previousMove : listOfPreviousMoves) {
 				if (previousMove != null && potentialNeighbour.getTo().equals(previousMove.getFrom())) {
-//					System.out.println("A cycle was detected, removing it from the list potential neighbors.");
 					listOfNeighbors.remove(i);
 					--i; // Since we removed an element and the rest of the list was shifted, we don't want to skip other possible neighbors.
 				}
@@ -55,15 +54,11 @@ public class BoardState {
 		if (listOfNeighbors.size() == 0) {
 			// If the size of neighbors is empty, it means that there are no valid moves,
 			// therefore we can evaluate the value of the list of moves.
-			
-//			System.out.println("The list of neighbors is equal to 0, a leaf of the tree has been reached. Adding the current state to the priority queue.");
-			
 			this.addCurrentStateToPriorityQueue();
 		} else {
 			// If the size is not 0, it means that we can do more hops and therefore we need to explore
 			// these moves and see what value they will have.
 			for (CCMove moveToExecute : listOfNeighbors) {
-//				System.out.println("Creating a new state for move that starts from "+moveToExecute.getFrom().toString()+" and ends in "+moveToExecute.getTo().toString()+".");		
 				// Create a copy of the current board configuration.
 				CCBoard copyOfBoard = (CCBoard) this.currentState.clone();
 				// Executes the move on the copy of the board.
@@ -109,22 +104,13 @@ public class BoardState {
 			// that the turn is now over. If the last move is not a hop, the move with null 'to' and 'from' must not be added.
 			for (int i = (this.listOfPreviousMoves.size()-1) ; i >= 0 ; i--) {
 				if (this.listOfPreviousMoves.get(i) != null && this.listOfPreviousMoves.get(i).isHop()) {
-//					System.out.println("Adding a move with NULL 'to' and 'from' at " + i);
 					listOfPreviousMoves.add(new CCMove(this.playerBackPointer.getColor(), null, null));
 					break;
-				} else {
-					if (this.listOfPreviousMoves.get(i) == null) {
-//						System.out.println("The NULL move has been encountered at i="+i);
-					} else {
-//						System.out.println("This move was encountered: " + this.listOfPreviousMoves.get(i).toPrettyString() + " at i=" + i);
-					}
 				}
 			}
 			
 			// This null move will trigger the end of the set of states to execute.
 			listOfPreviousMoves.add(null);
-
-//			System.out.println("The final value of this leaf state is " + this.valueOfState);
 			// Updates the priority queue in the Player thread.
 			this.playerBackPointer.updatePriorityQueue(this);
 		}
