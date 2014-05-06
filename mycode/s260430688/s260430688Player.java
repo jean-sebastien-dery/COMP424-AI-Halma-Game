@@ -160,7 +160,7 @@ public class s260430688Player extends Player {
 				do {
 					// Pops the best desired state in the priority queue.
 					BoardState bestBoardState = this.priorityQueueOfBoardStates.poll();
-					listOfMovesToReachBestState = bestBoardState.getListOfMoves();
+					listOfMovesToReachBestState = bestBoardState.getListOfMovesToReachState();
 				} while(listOfMovesToReachBestState.isEmpty());
 				
 				return (listOfMovesToReachBestState.removeFirst());

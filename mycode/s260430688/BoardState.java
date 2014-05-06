@@ -17,15 +17,50 @@ import java.util.LinkedList;
  *
  */
 public class BoardState {
+	/**
+	 * The penalty applied to a move that takes a token out of the origin base.
+	 */
 	private final int MOVE_PENALTY_IF_MOVING_FROM_BASE = 300;
+	
+	/**
+	 * The penalty applied to a token that is in the origin base.
+	 */
 	private final int MOVE_PENALTY_IF_IN_BASE = 500;
 	
+	/**
+	 * The current board configuration.
+	 */
 	private CCBoard currentState;
+	
+	/**
+	 * The token that will be used to generate neighbor states with the aid of valid moves.
+	 */
 	private Point tokenToConsider;
+	
+	/**
+	 * The list of moves required to reach the current board configuration.
+	 */
 	private LinkedList<CCMove> listOfPreviousMoves;
+	
+	/**
+	 * The value of the current board configuration used by the priority queue.
+	 */
 	public double valueOfState;
+	
+	/**
+	 * The back pointer that points to the player implementation.
+	 */
 	s260430688Player playerBackPointer;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param playerBackPointer A back pointer that points to the player's implementation.
+	 * @param currentBoardConfiguration The current state of the board.
+	 * @param tokenToConsider The token to consider for the generation of neighbors and value determination.
+	 * @param listOfPreviousMoves The list of moves that were executed to reach the 'currentBoardConfiguration'.
+	 * @param valueOfState The value in the priority queue of the 'currentBoardConfiguration'.
+	 */
 	BoardState(s260430688Player playerBackPointer, CCBoard currentBoardConfiguration, Point tokenToConsider, LinkedList<CCMove> listOfPreviousMoves, double valueOfState) {
 		this.currentState = currentBoardConfiguration;
 		this.tokenToConsider = tokenToConsider;
@@ -34,6 +69,9 @@ public class BoardState {
 		this.valueOfState = valueOfState;
 	}
 	
+	/**
+	 * Exploits the current state by determining valid moves from the current board configuration and determining the value of the generated neighbors.
+	 */
 	public void exploitState() {
 		ArrayList<CCMove> listOfNeighbors = currentState.getLegalMoveForPiece(this.tokenToConsider, this.playerBackPointer.getColor());
 		
@@ -64,26 +102,7 @@ public class BoardState {
 				// Executes the move on the copy of the board.
 				copyOfBoard.move(moveToExecute);
 				
-				// Updates the value of the heuristic.
-				double valueOfNewState = this.valueOfState - this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getFrom()) + this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getTo());
-				
-				// This section will add the penalty to the move if it is in the goal zone and/or goes out of it.
-				boolean isMoveOriginInMyBase;
-				if (this.listOfPreviousMoves.isEmpty()) {
-					isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor());
-				} else {
-					isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(this.listOfPreviousMoves.getFirst().getFrom(), this.playerBackPointer.getColor());
-				}
-				boolean isMoveDestinationInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor());
-				
-				// Makes sure that the tokens go out of the initial goal zone as soon as possible.
-				if (isMoveOriginInMyBase && !isMoveDestinationInMyBase) {
-					valueOfNewState -= MOVE_PENALTY_IF_MOVING_FROM_BASE;
-				}
-				// Handles the situation where a token is not near the boarder of the goal zone.
-				if (isMoveOriginInMyBase) {
-					valueOfNewState -= MOVE_PENALTY_IF_IN_BASE;
-				}
+				double valueOfNewState = determineValueOfStateAfterMove(moveToExecute);
 				
 				// Creates a new list of past move.
 				@SuppressWarnings("unchecked")
@@ -97,6 +116,40 @@ public class BoardState {
 		}
 	}
 	
+	/**
+	 * Determines the value of the board after the move has been executed on the initial board configuration.
+	 * 
+	 * @param moveToExecute The move to execute on the initial board configuration.
+	 * @return The value of the state after the move has been executed on the initial board configuration.
+	 */
+	private double determineValueOfStateAfterMove(CCMove moveToExecute) {
+		// Updates the value of the heuristic.
+		double valueOfNewState = this.valueOfState - this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getFrom()) + this.playerBackPointer.getHeuristicValueForToken(moveToExecute.getTo());
+		
+		// This section will add the penalty to the move if it is in the goal zone and/or goes out of it.
+		boolean isMoveOriginInMyBase;
+		if (this.listOfPreviousMoves.isEmpty()) {
+			isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getFrom(), this.playerBackPointer.getColor());
+		} else {
+			isMoveOriginInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(this.listOfPreviousMoves.getFirst().getFrom(), this.playerBackPointer.getColor());
+		}
+		boolean isMoveDestinationInMyBase = this.playerBackPointer.isTokenInBaseOfPlayer(moveToExecute.getTo(), this.playerBackPointer.getColor());
+		
+		// Makes sure that the tokens go out of the initial goal zone as soon as possible.
+		if (isMoveOriginInMyBase && !isMoveDestinationInMyBase) {
+			valueOfNewState -= MOVE_PENALTY_IF_MOVING_FROM_BASE;
+		}
+		// Handles the situation where a token is not near the boarder of the goal zone.
+		if (isMoveOriginInMyBase) {
+			valueOfNewState -= MOVE_PENALTY_IF_IN_BASE;
+		}
+		
+		return (valueOfNewState);
+	}
+	
+	/**
+	 * Adds the current state to the priority queue used to determine what is the best desired state.
+	 */
 	private void addCurrentStateToPriorityQueue() {
 		if (!this.listOfPreviousMoves.isEmpty()) {
 			
@@ -116,7 +169,11 @@ public class BoardState {
 		}
 	}
 	
-	public LinkedList<CCMove> getListOfMoves() {
+	/**
+	 * 
+	 * @return The list of moves that were required in order to reach the current state.
+	 */
+	public LinkedList<CCMove> getListOfMovesToReachState() {
 		return (this.listOfPreviousMoves);
 	}
 }
